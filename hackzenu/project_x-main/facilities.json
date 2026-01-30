@@ -1,0 +1,37 @@
+{
+  "facilities": [
+    {
+      "id": "facility_001",
+      "name": "Green Recycling Center",
+      "type": "Full Service",
+      "lat": 40.7128,
+      "lon": -74.0060,
+      "accepts": ["plastic", "paper", "metal", "glass", "organic"],
+      "hours": "9 AM - 6 PM",
+      "phone": "+1-800-RECYCLE",
+      "address": "123 Green St, New York, NY 10001"
+    },
+    {
+      "id": "facility_002",
+      "name": "EcoHub Station",
+      "type": "Plastic & Paper",
+      "lat": 40.7489,
+      "lon": -73.9680,
+      "accepts": ["plastic", "paper"],
+      "hours": "8 AM - 8 PM",
+      "phone": "+1-800-ECO-HUB",
+      "address": "456 Eco Ave, New York, NY 10002"
+    },
+    {
+      "id": "facility_003",
+      "name": "E-Waste Processing",
+      "type": "Electronics",
+      "lat": 40.7614,
+      "lon": -73.9776,
+      "accepts": ["electronics"],
+      "hours": "10 AM - 5 PM",
+      "phone": "+1-800-E-WASTE",
+      "address": "789 Tech Blvd, New York, NY 10003"
+    }
+  ]
+}

@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Set Your Location - EcoSustain</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        color: #fff;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .header h1 {
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .header h1 i {
+        color: #4ade80;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .container {
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* Location Status */
+      .location-status {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .status-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .status-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+
+      .status-icon.loading {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+        animation: pulse 1.5s infinite;
+      }
+
+      .status-icon.success {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+
+      .status-icon.error {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.1);
+          opacity: 0.7;
+        }
+      }
+
+      .status-text h3 {
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+      }
+
+      .status-text p {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .accuracy-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-top: 10px;
+      }
+
+      .accuracy-badge.low {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+
+      /* Map Container */
+      .map-container {
+        height: 300px;
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+
+      /* Address Display */
+      .address-display {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .address-display h3 {
+        font-size: 1rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .address-display h3 i {
+        color: #22d3ee;
+      }
+
+      .address-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .address-text.placeholder {
+        color: rgba(255, 255, 255, 0.4);
+        font-style: italic;
+      }
+
+      /* Action Buttons */
+      .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .btn {
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s;
+        border: none;
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        color: #000;
+      }
+
+      .btn-primary:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 20px rgba(74, 222, 128, 0.4);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      /* Manual Address Form */
+      .manual-form {
+        display: none;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .manual-form.active {
+        display: block;
+      }
+
+      .manual-form h3 {
+        font-size: 1rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .manual-form h3 i {
+        color: #a855f7;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: #4ade80;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      /* Search Suggestions */
+      .search-container {
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 15px 20px 15px 50px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #4ade80;
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .search-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #1a1a2e;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        margin-top: 5px;
+        max-height: 250px;
+        overflow-y: auto;
+        z-index: 100;
+        display: none;
+      }
+
+      .search-suggestions.active {
+        display: block;
+      }
+
+      .suggestion-item {
+        padding: 12px 15px;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: background 0.2s;
+      }
+
+      .suggestion-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .suggestion-item:last-child {
+        border-bottom: none;
+      }
+
+      .suggestion-item i {
+        margin-right: 10px;
+        color: #4ade80;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 15px 25px;
+        border-radius: 10px;
+        z-index: 2000;
+        display: none;
+      }
+
+      .toast.success {
+        background: rgba(74, 222, 128, 0.9);
+        color: #000;
+      }
+
+      .toast.error {
+        background: rgba(239, 68, 68, 0.9);
+      }
+
+      /* Leaflet customization */
+      .leaflet-container {
+        background: #16213e;
+      }
+
+      /* Save As Section */
+      .save-as-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .save-as-section h4 {
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .label-options {
+        display: flex;
+        gap: 10px;
+      }
+
+      .label-option {
+        flex: 1;
+        cursor: pointer;
+      }
+
+      .label-option input {
+        display: none;
+      }
+
+      .label-option span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.85rem;
+        transition: all 0.3s;
+      }
+
+      .label-option:hover span {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .label-option.active span,
+      .label-option input:checked + span {
+        background: rgba(74, 222, 128, 0.2);
+        border-color: #4ade80;
+        color: #4ade80;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <button class="back-btn" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-location-dot"></i> Set Location</h1>
+      <div style="width: 30px"></div>
+    </header>
+
+    <div class="container">
+      <!-- Location Status -->
+      <div class="location-status">
+        <div class="status-header">
+          <div class="status-icon loading" id="statusIcon">
+            <i class="fas fa-location-crosshairs"></i>
+          </div>
+          <div class="status-text">
+            <h3 id="statusTitle">Fetching your location...</h3>
+            <p id="statusDesc">Using GPS for accurate location</p>
+          </div>
+        </div>
+        <div class="accuracy-badge" id="accuracyBadge" style="display: none">
+          <i class="fas fa-crosshairs"></i>
+          <span id="accuracyText">Accuracy: --</span>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="Search for area, street name..."
+        />
+        <div class="search-suggestions" id="searchSuggestions"></div>
+      </div>
+
+      <!-- Map -->
+      <div class="map-container">
+        <div id="map"></div>
+      </div>
+
+      <!-- Address Display -->
+      <div class="address-display">
+        <h3><i class="fas fa-map-marker-alt"></i> Detected Address</h3>
+        <p class="address-text placeholder" id="addressText">
+          Waiting for location...
+        </p>
+      </div>
+
+      <!-- Manual Address Form -->
+      <div class="manual-form" id="manualForm">
+        <h3><i class="fas fa-edit"></i> Enter Address Manually</h3>
+        <div class="form-group">
+          <label>Street / Building</label>
+          <input
+            type="text"
+            id="manualStreet"
+            placeholder="House No, Building Name, Street"
+          />
+        </div>
+        <div class="form-group">
+          <label>Landmark</label>
+          <input type="text" id="manualLandmark" placeholder="Near landmark" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Area</label>
+            <input type="text" id="manualArea" placeholder="Area / Locality" />
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" id="manualCity" placeholder="City" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Pincode</label>
+          <input
+            type="text"
+            id="manualPincode"
+            placeholder="6-digit pincode"
+            maxlength="6"
+          />
+        </div>
+      </div>
+
+      <!-- Save As Label -->
+      <div class="save-as-section">
+        <h4>Save this address as:</h4>
+        <div class="label-options">
+          <label class="label-option active">
+            <input type="radio" name="addressLabel" value="Home" checked />
+            <span><i class="fas fa-home"></i> Home</span>
+          </label>
+          <label class="label-option">
+            <input type="radio" name="addressLabel" value="Work" />
+            <span><i class="fas fa-briefcase"></i> Work</span>
+          </label>
+          <label class="label-option">
+            <input type="radio" name="addressLabel" value="Other" />
+            <span><i class="fas fa-map-pin"></i> Other</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button
+          class="btn btn-primary"
+          id="confirmBtn"
+          onclick="confirmLocation()"
+        >
+          <i class="fas fa-check"></i> Confirm This Location
+        </button>
+        <button
+          class="btn btn-secondary"
+          id="retryBtn"
+          onclick="retryLocation()"
+        >
+          <i class="fas fa-sync-alt"></i> Retry GPS
+        </button>
+        <button
+          class="btn btn-secondary"
+          id="manualBtn"
+          onclick="toggleManualForm()"
+        >
+          <i class="fas fa-edit"></i> Enter Manually
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      const API_BASE = "/api";
+      let token =
+        localStorage.getItem("token") || localStorage.getItem("authToken");
+      let map = null;
+      let marker = null;
+      let currentLocation = null;
+      let searchTimeout = null;
+
+      // Check auth
+      if (!token) {
+        window.location.href = "/";
+      }
+
+      // Initialize map
+      function initMap() {
+        map = L.map("map").setView([20.5937, 78.9629], 5); // India center
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(map);
+
+        // Click on map to set location
+        map.on("click", function (e) {
+          setMarker(e.latlng.lat, e.latlng.lng);
+          reverseGeocode(e.latlng.lat, e.latlng.lng);
+        });
+      }
+
+      // Set marker on map
+      function setMarker(lat, lng) {
+        if (marker) {
+          marker.setLatLng([lat, lng]);
+        } else {
+          marker = L.marker([lat, lng], {
+            draggable: true,
+          }).addTo(map);
+
+          marker.on("dragend", function (e) {
+            const pos = e.target.getLatLng();
+            reverseGeocode(pos.lat, pos.lng);
+          });
+        }
+        map.setView([lat, lng], 17);
+      }
+
+      // Get high-accuracy GPS location
+      function getAccurateLocation() {
+        updateStatus(
+          "loading",
+          "Fetching your location...",
+          "Using GPS for accurate location",
+        );
+
+        if (!navigator.geolocation) {
+          updateStatus(
+            "error",
+            "GPS Not Available",
+            "Your browser doesn't support GPS",
+          );
+          return;
+        }
+
+        // High accuracy options like Swiggy/Blinkit
+        const options = {
+          enableHighAccuracy: true, // Use GPS, not WiFi/Cell
+          timeout: 15000, // Wait up to 15 seconds
+          maximumAge: 0, // Don't use cached location
+        };
+
+        navigator.geolocation.getCurrentPosition(
+          onLocationSuccess,
+          onLocationError,
+          options,
+        );
+
+        // Also watch for better accuracy
+        navigator.geolocation.watchPosition(
+          onLocationSuccess,
+          () => {}, // Ignore watch errors
+          options,
+        );
+      }
+
+      // Location success callback
+      function onLocationSuccess(position) {
+        const { latitude, longitude, accuracy, altitude, heading, speed } =
+          position.coords;
+
+        currentLocation = {
+          lat: latitude,
+          lng: longitude,
+          accuracy: accuracy,
+          altitude: altitude,
+          heading: heading,
+          speed: speed,
+        };
+
+        // Update UI
+        setMarker(latitude, longitude);
+        reverseGeocode(latitude, longitude);
+
+        // Show accuracy
+        const accuracyBadge = document.getElementById("accuracyBadge");
+        const accuracyText = document.getElementById("accuracyText");
+        accuracyBadge.style.display = "inline-flex";
+
+        if (accuracy <= 20) {
+          accuracyText.textContent = `High Accuracy: ${Math.round(accuracy)}m`;
+          accuracyBadge.classList.remove("low");
+          updateStatus(
+            "success",
+            "Location Found!",
+            "High accuracy GPS location",
+          );
+        } else if (accuracy <= 100) {
+          accuracyText.textContent = `Good Accuracy: ${Math.round(accuracy)}m`;
+          accuracyBadge.classList.remove("low");
+          updateStatus("success", "Location Found!", "Good GPS accuracy");
+        } else {
+          accuracyText.textContent = `Accuracy: ${Math.round(accuracy)}m`;
+          accuracyBadge.classList.add("low");
+          updateStatus(
+            "success",
+            "Location Found",
+            "Tap map to adjust if needed",
+          );
+        }
+
+        document.getElementById("confirmBtn").disabled = false;
+      }
+
+      // Location error callback
+      function onLocationError(error) {
+        let message = "";
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message = "Please allow location access in browser settings";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message = "Location unavailable. Try again or enter manually";
+            break;
+          case error.TIMEOUT:
+            message = "Location request timed out. Retrying...";
+            getAccurateLocation(); // Retry
+            return;
+        }
+        updateStatus("error", "Location Error", message);
+      }
+
+      // Update status display
+      function updateStatus(type, title, desc) {
+        const icon = document.getElementById("statusIcon");
+        const titleEl = document.getElementById("statusTitle");
+        const descEl = document.getElementById("statusDesc");
+
+        icon.className = "status-icon " + type;
+
+        if (type === "loading") {
+          icon.innerHTML = '<i class="fas fa-location-crosshairs"></i>';
+        } else if (type === "success") {
+          icon.innerHTML = '<i class="fas fa-check"></i>';
+        } else {
+          icon.innerHTML = '<i class="fas fa-exclamation"></i>';
+        }
+
+        titleEl.textContent = title;
+        descEl.textContent = desc;
+      }
+
+      // Reverse geocode coordinates to address
+      async function reverseGeocode(lat, lng) {
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`,
+            { headers: { "User-Agent": "EcoSustain-App/1.0" } },
+          );
+          const data = await response.json();
+
+          if (data && data.display_name) {
+            document.getElementById("addressText").textContent =
+              data.display_name;
+            document
+              .getElementById("addressText")
+              .classList.remove("placeholder");
+
+            // Also fill manual form
+            if (data.address) {
+              document.getElementById("manualStreet").value =
+                data.address.road || data.address.pedestrian || "";
+              document.getElementById("manualLandmark").value =
+                data.address.neighbourhood || data.address.suburb || "";
+              document.getElementById("manualArea").value =
+                data.address.suburb || data.address.locality || "";
+              document.getElementById("manualCity").value =
+                data.address.city ||
+                data.address.town ||
+                data.address.village ||
+                "";
+              document.getElementById("manualPincode").value =
+                data.address.postcode || "";
+            }
+
+            currentLocation = { ...currentLocation, lat, lng, address: data };
+            document.getElementById("confirmBtn").disabled = false;
+          }
+        } catch (error) {
+          console.error("Reverse geocode error:", error);
+        }
+      }
+
+      // Search places
+      async function searchPlaces(query) {
+        if (query.length < 3) {
+          document
+            .getElementById("searchSuggestions")
+            .classList.remove("active");
+          return;
+        }
+
+        try {
+          let url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=in&limit=5`;
+
+          if (currentLocation) {
+            url += `&viewbox=${currentLocation.lng - 0.5},${currentLocation.lat + 0.5},${currentLocation.lng + 0.5},${currentLocation.lat - 0.5}`;
+          }
+
+          const response = await fetch(url, {
+            headers: { "User-Agent": "EcoSustain-App/1.0" },
+          });
+          const places = await response.json();
+
+          const suggestions = document.getElementById("searchSuggestions");
+          suggestions.innerHTML = places
+            .map(
+              (place) => `
+                    <div class="suggestion-item" onclick="selectPlace(${place.lat}, ${place.lon}, '${place.display_name.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-map-marker-alt"></i>
+                        ${place.display_name.substring(0, 80)}...
+                    </div>
+                `,
+            )
+            .join("");
+
+          suggestions.classList.add("active");
+        } catch (error) {
+          console.error("Search error:", error);
+        }
+      }
+
+      // Select a place from suggestions
+      function selectPlace(lat, lng, name) {
+        document.getElementById("searchSuggestions").classList.remove("active");
+        document.getElementById("searchInput").value = name;
+        setMarker(lat, lng);
+        reverseGeocode(lat, lng);
+        currentLocation = { lat, lng };
+      }
+
+      // Confirm and save location
+      async function confirmLocation() {
+        if (!currentLocation) {
+          showToast("Please get your location first", "error");
+          return;
+        }
+
+        // Re-check token before making request
+        if (!token) {
+          token =
+            localStorage.getItem("token") || localStorage.getItem("authToken");
+          if (!token) {
+            showToast("Session expired. Please login again.", "error");
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 1500);
+            return;
+          }
+        }
+
+        const btn = document.getElementById("confirmBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        // Get selected label
+        const labelInput = document.querySelector(
+          'input[name="addressLabel"]:checked',
+        );
+        const label = labelInput ? labelInput.value : "Home";
+
+        try {
+          // First save to profile
+          const response = await fetch(`${API_BASE}/location/save`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              lat: currentLocation.lat,
+              lng: currentLocation.lng,
+              accuracy: currentLocation.accuracy,
+              altitude: currentLocation.altitude,
+              heading: currentLocation.heading,
+              speed: currentLocation.speed,
+              source: "gps",
+            }),
+          });
+
+          // Handle authentication errors
+          if (response.status === 401) {
+            showToast("Session expired. Please login again.", "error");
+            localStorage.removeItem("token");
+            localStorage.removeItem("authToken");
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 1500);
+            return;
+          }
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Also save to savedAddresses for order use
+            const manualStreet = document.getElementById("manualStreet").value;
+            const manualLandmark =
+              document.getElementById("manualLandmark").value;
+            const manualArea = document.getElementById("manualArea").value;
+            const manualCity = document.getElementById("manualCity").value;
+            const manualPincode =
+              document.getElementById("manualPincode").value;
+
+            try {
+              await fetch(`${API_BASE}/location/addresses`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  label: label,
+                  street: manualStreet || data.location?.address?.street || "",
+                  landmark:
+                    manualLandmark || data.location?.address?.landmark || "",
+                  area: manualArea || data.location?.address?.area || "",
+                  city: manualCity || data.location?.address?.city || "",
+                  pincode:
+                    manualPincode || data.location?.address?.pincode || "",
+                  lat: currentLocation.lat,
+                  lng: currentLocation.lng,
+                  isDefault: true,
+                }),
+              });
+            } catch (addrErr) {
+              console.log("Saved address error (non-critical):", addrErr);
+              // Non-critical - continue anyway
+            }
+
+            showToast("Location saved successfully!", "success");
+            setTimeout(() => {
+              window.location.href = "/dashboard.html";
+            }, 1500);
+          } else {
+            showToast(data.message || "Error saving location", "error");
+            btn.disabled = false;
+            btn.innerHTML =
+              '<i class="fas fa-check"></i> Confirm This Location';
+          }
+        } catch (error) {
+          console.error("Location save error:", error);
+          showToast(
+            "Connection error. Check your internet and try again.",
+            "error",
+          );
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-check"></i> Confirm This Location';
+        }
+      }
+
+      // Retry GPS
+      function retryLocation() {
+        getAccurateLocation();
+      }
+
+      // Toggle manual form
+      function toggleManualForm() {
+        const form = document.getElementById("manualForm");
+        form.classList.toggle("active");
+
+        const btn = document.getElementById("manualBtn");
+        if (form.classList.contains("active")) {
+          btn.innerHTML = '<i class="fas fa-times"></i> Cancel Manual Entry';
+        } else {
+          btn.innerHTML = '<i class="fas fa-edit"></i> Enter Manually';
+        }
+      }
+
+      // Go back
+      function goBack() {
+        window.history.back();
+      }
+
+      // Show toast
+      function showToast(message, type = "info") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast " + type;
+        toast.style.display = "block";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 3000);
+      }
+
+      // Search input handler
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          searchPlaces(e.target.value);
+        }, 300);
+      });
+
+      // Close suggestions on click outside
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".search-container")) {
+          document
+            .getElementById("searchSuggestions")
+            .classList.remove("active");
+        }
+      });
+
+      // Label option selection
+      document.querySelectorAll(".label-option").forEach((option) => {
+        option.addEventListener("click", () => {
+          document
+            .querySelectorAll(".label-option")
+            .forEach((o) => o.classList.remove("active"));
+          option.classList.add("active");
+        });
+      });
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", () => {
+        initMap();
+        getAccurateLocation();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1344 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Schedule Pickup - EcoSustain</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        color: #fff;
+      }
+      .header {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .header h1 {
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .header h1 i {
+        color: #4ade80;
+      }
+      .back-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+      .container {
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+        padding-bottom: 120px;
+      }
+
+      .location-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .location-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .location-header h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1rem;
+      }
+      .location-header h3 i {
+        color: #4ade80;
+      }
+      .change-btn {
+        background: rgba(74, 222, 128, 0.2);
+        border: none;
+        color: #4ade80;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .location-details {
+        display: flex;
+        gap: 15px;
+      }
+      .location-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #4ade80, #22d3ee);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+      .location-text {
+        flex: 1;
+      }
+      .location-label {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 5px;
+      }
+      .location-address {
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+      .no-location {
+        text-align: center;
+        padding: 30px;
+      }
+      .no-location i {
+        font-size: 48px;
+        color: rgba(255, 255, 255, 0.3);
+        margin-bottom: 15px;
+      }
+      .no-location p {
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .section-title i {
+        color: #22d3ee;
+      }
+
+      .waste-types {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 25px;
+      }
+      .waste-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .waste-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .waste-item.selected {
+        border-color: #4ade80;
+        background: rgba(74, 222, 128, 0.1);
+      }
+      .waste-item-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+      .waste-item-icon.plastic {
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+      }
+      .waste-item-icon.paper {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+      .waste-item-icon.glass {
+        background: rgba(139, 92, 246, 0.2);
+        color: #8b5cf6;
+      }
+      .waste-item-icon.metal {
+        background: rgba(156, 163, 175, 0.2);
+        color: #9ca3af;
+      }
+      .waste-item-icon.ewaste {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+      .waste-item-icon.organic {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+      }
+      .waste-item h4 {
+        font-size: 0.95rem;
+        margin-bottom: 3px;
+      }
+      .waste-item p {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .quantity-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .quantity-options {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .quantity-option {
+        flex: 1;
+        min-width: 80px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid transparent;
+        border-radius: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .quantity-option:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .quantity-option.selected {
+        border-color: #22d3ee;
+        background: rgba(34, 211, 238, 0.1);
+      }
+      .quantity-option span {
+        display: block;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .quantity-option small {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* Google Calendar Style */
+      .calendar-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .calendar-nav {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .calendar-nav button {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #fff;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+      }
+      .calendar-nav button:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .calendar-month {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+      .today-btn {
+        background: rgba(74, 222, 128, 0.2);
+        border: none;
+        color: #4ade80;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+      }
+      .calendar-day-header {
+        text-align: center;
+        padding: 10px 5px;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+        font-weight: 600;
+      }
+      .calendar-day {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        position: relative;
+      }
+      .calendar-day:hover:not(.disabled):not(.empty) {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .calendar-day.today {
+        border: 2px solid #4ade80;
+      }
+      .calendar-day.selected {
+        background: linear-gradient(135deg, #4ade80, #22d3ee);
+        color: #1a1a2e;
+        font-weight: 600;
+      }
+      .calendar-day.disabled {
+        color: rgba(255, 255, 255, 0.2);
+        cursor: not-allowed;
+      }
+      .calendar-day.other-month {
+        color: rgba(255, 255, 255, 0.3);
+      }
+
+      .time-section {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .time-section h4 {
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .time-slots {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .time-slot {
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .time-slot:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .time-slot.selected {
+        border-color: #22d3ee;
+        background: rgba(34, 211, 238, 0.15);
+      }
+      .time-slot i {
+        color: #fbbf24;
+      }
+
+      .selected-datetime {
+        background: linear-gradient(
+          135deg,
+          rgba(74, 222, 128, 0.1),
+          rgba(34, 211, 238, 0.1)
+        );
+        border-radius: 12px;
+        padding: 15px;
+        margin-top: 15px;
+        display: none;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid rgba(74, 222, 128, 0.3);
+      }
+      .selected-datetime.active {
+        display: flex;
+      }
+      .selected-datetime i {
+        font-size: 24px;
+        color: #4ade80;
+      }
+      .selected-datetime .datetime-text {
+        flex: 1;
+      }
+      .selected-datetime .date-display {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      .selected-datetime .time-display {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .notes-section {
+        margin-bottom: 25px;
+      }
+      .notes-input {
+        width: 100%;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: #fff;
+        font-size: 0.95rem;
+        resize: none;
+        min-height: 80px;
+      }
+      .notes-input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+      .notes-input:focus {
+        outline: none;
+        border-color: #4ade80;
+      }
+
+      .pricing-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .pricing-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+      }
+      .pricing-row.total {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 12px;
+        margin-top: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .eco-points {
+        color: #4ade80;
+      }
+
+      .bottom-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .bottom-content {
+        max-width: 600px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      .total-display {
+        flex: 1;
+      }
+      .total-display small {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .total-display span {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #4ade80;
+      }
+      .order-btn {
+        flex: 2;
+        padding: 16px 30px;
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        border: none;
+        border-radius: 12px;
+        color: #1a1a2e;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .order-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        display: none;
+        z-index: 1000;
+      }
+      .toast.success {
+        background: rgba(74, 222, 128, 0.9);
+        color: #fff;
+      }
+      .toast.error {
+        background: rgba(239, 68, 68, 0.9);
+        color: #fff;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+      }
+      .modal-overlay.active {
+        display: flex;
+      }
+      .modal {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .modal-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(74, 222, 128, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 40px;
+        color: #4ade80;
+      }
+      .modal h2 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+      .modal p {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+      .order-id {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-family: monospace;
+        font-size: 1.1rem;
+      }
+      .modal-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        border: none;
+        border-radius: 12px;
+        color: #1a1a2e;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+      }
+      .loading-overlay.active {
+        display: flex;
+      }
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #4ade80;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .scan-banner {
+        background: linear-gradient(
+          135deg,
+          rgba(74, 222, 128, 0.2),
+          rgba(34, 211, 238, 0.2)
+        );
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: none;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid rgba(74, 222, 128, 0.3);
+      }
+      .scan-banner.active {
+        display: flex;
+      }
+      .scan-banner i {
+        font-size: 24px;
+        color: #4ade80;
+      }
+      .scan-banner .banner-text {
+        flex: 1;
+      }
+      .scan-banner .banner-title {
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .scan-banner .banner-desc {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <button class="back-btn" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-recycle"></i> Schedule Pickup</h1>
+      <div style="width: 30px"></div>
+    </header>
+
+    <div class="container">
+      <div class="scan-banner" id="scanBanner">
+        <i class="fas fa-robot"></i>
+        <div class="banner-text">
+          <div class="banner-title">AI Scan Results Applied</div>
+          <div class="banner-desc" id="scanDesc">
+            Items auto-selected from your scan
+          </div>
+        </div>
+      </div>
+
+      <div class="location-card" id="locationCard">
+        <div class="location-header">
+          <h3><i class="fas fa-map-marker-alt"></i> Pickup Location</h3>
+          <button class="change-btn" onclick="changeLocation()">
+            <i class="fas fa-edit"></i> Change
+          </button>
+        </div>
+        <div class="location-details" id="locationDetails"></div>
+      </div>
+
+      <h3 class="section-title">
+        <i class="fas fa-trash-alt"></i> What are you recycling?
+      </h3>
+      <div class="waste-types" id="wasteTypes">
+        <div
+          class="waste-item"
+          data-type="plastic"
+          data-price="5"
+          onclick="toggleWaste(this)"
+        >
+          <div class="waste-item-icon plastic">
+            <i class="fas fa-wine-bottle"></i>
+          </div>
+          <h4>Plastic</h4>
+          <p>₹5/kg • Bottles, containers</p>
+        </div>
+        <div
+          class="waste-item"
+          data-type="paper"
+          data-price="8"
+          onclick="toggleWaste(this)"
+        >
+          <div class="waste-item-icon paper">
+            <i class="fas fa-newspaper"></i>
+          </div>
+          <h4>Paper</h4>
+          <p>₹8/kg • Newspapers, cardboard</p>
+        </div>
+        <div
+          class="waste-item"
+          data-type="glass"
+          data-price="3"
+          onclick="toggleWaste(this)"
+        >
+          <div class="waste-item-icon glass">
+            <i class="fas fa-glass-martini"></i>
+          </div>
+          <h4>Glass</h4>
+          <p>₹3/kg • Bottles, jars</p>
+        </div>
+        <div
+          class="waste-item"
+          data-type="metal"
+          data-price="25"
+          onclick="toggleWaste(this)"
+        >
+          <div class="waste-item-icon metal"><i class="fas fa-cog"></i></div>
+          <h4>Metal</h4>
+          <p>₹25/kg • Cans, utensils</p>
+        </div>
+        <div
+          class="waste-item"
+          data-type="ewaste"
+          data-price="50"
+          onclick="toggleWaste(this)"
+        >
+          <div class="waste-item-icon ewaste">
+            <i class="fas fa-laptop"></i>
+          </div>
+          <h4>E-Waste</h4>
+          <p>₹50/kg • Electronics</p>
+        </div>
+        <div
+          class="waste-item"
+          data-type="organic"
+          data-price="2"
+          onclick="toggleWaste(this)"
+        >
+          <div class="waste-item-icon organic"><i class="fas fa-leaf"></i></div>
+          <h4>Organic</h4>
+          <p>₹2/kg • Kitchen waste</p>
+        </div>
+      </div>
+
+      <div class="quantity-section">
+        <h3 class="section-title">
+          <i class="fas fa-weight-hanging"></i> Estimated Quantity
+        </h3>
+        <div class="quantity-options">
+          <div
+            class="quantity-option"
+            data-qty="5"
+            onclick="selectQuantity(this)"
+          >
+            <span>5 kg</span><small>Small</small>
+          </div>
+          <div
+            class="quantity-option selected"
+            data-qty="10"
+            onclick="selectQuantity(this)"
+          >
+            <span>10 kg</span><small>Medium</small>
+          </div>
+          <div
+            class="quantity-option"
+            data-qty="20"
+            onclick="selectQuantity(this)"
+          >
+            <span>20 kg</span><small>Large</small>
+          </div>
+          <div
+            class="quantity-option"
+            data-qty="50"
+            onclick="selectQuantity(this)"
+          >
+            <span>50+ kg</span><small>Bulk</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="calendar-section">
+        <h3 class="section-title">
+          <i class="fas fa-calendar-alt"></i> Select Date & Time
+        </h3>
+        <div class="calendar-header">
+          <div class="calendar-nav">
+            <button onclick="prevMonth()">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="calendar-month" id="calendarMonth">January 2026</span>
+            <button onclick="nextMonth()">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <button class="today-btn" onclick="goToToday()">Today</button>
+        </div>
+        <div class="calendar-grid" id="calendarGrid">
+          <div class="calendar-day-header">Sun</div>
+          <div class="calendar-day-header">Mon</div>
+          <div class="calendar-day-header">Tue</div>
+          <div class="calendar-day-header">Wed</div>
+          <div class="calendar-day-header">Thu</div>
+          <div class="calendar-day-header">Fri</div>
+          <div class="calendar-day-header">Sat</div>
+        </div>
+        <div class="time-section">
+          <h4><i class="fas fa-clock"></i> Select Time Slot</h4>
+          <div class="time-slots">
+            <div
+              class="time-slot"
+              data-time="09:00-12:00"
+              onclick="selectTime(this)"
+            >
+              <i class="fas fa-sun"></i><span>9 AM - 12 PM</span>
+            </div>
+            <div
+              class="time-slot"
+              data-time="12:00-15:00"
+              onclick="selectTime(this)"
+            >
+              <i class="fas fa-sun"></i><span>12 PM - 3 PM</span>
+            </div>
+            <div
+              class="time-slot"
+              data-time="15:00-18:00"
+              onclick="selectTime(this)"
+            >
+              <i class="fas fa-cloud-sun"></i><span>3 PM - 6 PM</span>
+            </div>
+            <div
+              class="time-slot"
+              data-time="18:00-21:00"
+              onclick="selectTime(this)"
+            >
+              <i class="fas fa-moon"></i><span>6 PM - 9 PM</span>
+            </div>
+          </div>
+        </div>
+        <div class="selected-datetime" id="selectedDatetime">
+          <i class="fas fa-calendar-check"></i>
+          <div class="datetime-text">
+            <div class="date-display" id="dateDisplay">--</div>
+            <div class="time-display" id="timeDisplay">--</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="notes-section">
+        <h3 class="section-title">
+          <i class="fas fa-sticky-note"></i> Additional Notes
+        </h3>
+        <textarea
+          class="notes-input"
+          id="notes"
+          placeholder="Any special instructions? (e.g., Ring bell twice)"
+        ></textarea>
+      </div>
+
+      <div class="pricing-card">
+        <h3 class="section-title">
+          <i class="fas fa-receipt"></i> Estimated Earnings
+        </h3>
+        <div class="pricing-row">
+          <span>Recyclables Value</span><span id="wasteValue">₹0</span>
+        </div>
+        <div class="pricing-row">
+          <span>Pickup Charge</span><span>- ₹0</span>
+        </div>
+        <div class="pricing-row eco-points">
+          <span><i class="fas fa-leaf"></i> Eco Points</span
+          ><span id="ecoPoints">+0 pts</span>
+        </div>
+        <div class="pricing-row total">
+          <span>You'll Earn</span><span id="totalEarnings">₹0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="bottom-content">
+        <div class="total-display">
+          <small>Estimated</small><br /><span id="bottomTotal">₹0</span>
+        </div>
+        <button class="order-btn" id="orderBtn" onclick="placeOrder()">
+          <i class="fas fa-check-circle"></i> Schedule Pickup
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="successModal">
+      <div class="modal">
+        <div class="modal-icon"><i class="fas fa-check"></i></div>
+        <h2>Pickup Scheduled!</h2>
+        <p>Our collector will arrive during your selected time slot.</p>
+        <div class="order-id" id="orderId">ORD-XXXXXX</div>
+        <button class="modal-btn" onclick="goToDashboard()">
+          <i class="fas fa-home"></i> Back to Dashboard
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="spinner"></div>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const API_BASE = "/api";
+      let token =
+        localStorage.getItem("token") || localStorage.getItem("authToken");
+      if (!token) window.location.href = "/";
+
+      let selectedWastes = [],
+        selectedQuantity = 10,
+        selectedDate = null,
+        selectedTime = null,
+        userLocation = null;
+      let currentMonth = new Date(),
+        today = new Date();
+      let scanData = null; // Store scan data for order
+      const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const dayNames = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadLocation();
+        renderCalendar();
+        checkScanResults();
+      });
+
+      function checkScanResults() {
+        const scanResults = localStorage.getItem("scanResults");
+        const pendingScanResults = localStorage.getItem("pendingScanResults");
+        const results = scanResults || pendingScanResults;
+
+        if (results && window.location.search.includes("from=scan")) {
+          try {
+            const parsed = JSON.parse(results);
+            applyScanResults(parsed);
+            // Store scan data for order creation (reference DB record by scanId)
+            scanData = {
+              scanId: parsed.scanId, // This is the DB reference
+              aiAnalysis: {
+                category: parsed.items?.[0]?.category || "Mixed",
+                recyclable: parsed.recyclableCount > 0,
+                estimatedWeight: parsed.totalWeight,
+                quality: "good",
+                confidence: 0.85,
+              },
+              scannedAt: new Date().toISOString(),
+            };
+            localStorage.removeItem("scanResults");
+            localStorage.removeItem("pendingScanResults");
+          } catch (e) {
+            console.error(e);
+          }
+        } else {
+          // No scan data - show warning and option to scan first
+          showScanRequiredBanner();
+        }
+      }
+
+      function showScanRequiredBanner() {
+        const container = document.querySelector(".container");
+        const banner = document.createElement("div");
+        banner.className = "scan-required-banner";
+        banner.innerHTML = `
+                <div style="background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: center;">
+                    <i class="fas fa-camera" style="font-size: 24px; color: #fbbf24; margin-bottom: 10px; display: block;"></i>
+                    <p style="margin-bottom: 10px; color: #fbbf24;">📷 Photo Required</p>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 15px;">Please scan or take a photo of your waste before scheduling pickup. This helps us prepare for efficient collection.</p>
+                    <button onclick="window.location.href='/scan.html'" style="background: linear-gradient(90deg, #4ade80, #22d3ee); border: none; color: #1a1a2e; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-weight: 600;">
+                        <i class="fas fa-camera"></i> Scan Waste First
+                    </button>
+                </div>
+            `;
+        container.insertBefore(banner, container.firstChild);
+      }
+
+      function applyScanResults(results) {
+        document.getElementById("scanBanner").classList.add("active");
+        document.getElementById("scanDesc").textContent =
+          `${results.totalItems} items • Est. ${results.totalWeight} kg`;
+        const categoryMap = {
+          Plastic: "plastic",
+          Paper: "paper",
+          Glass: "glass",
+          Metal: "metal",
+          "E-Waste": "ewaste",
+          Organic: "organic",
+        };
+        results.items.forEach((item) => {
+          const type = categoryMap[item.category];
+          if (type) {
+            const el = document.querySelector(
+              `.waste-item[data-type="${type}"]`,
+            );
+            if (el && !el.classList.contains("selected")) toggleWaste(el);
+          }
+        });
+        const qty = Math.ceil(results.totalWeight);
+        let qtyEl;
+        if (qty <= 5)
+          qtyEl = document.querySelector('.quantity-option[data-qty="5"]');
+        else if (qty <= 10)
+          qtyEl = document.querySelector('.quantity-option[data-qty="10"]');
+        else if (qty <= 20)
+          qtyEl = document.querySelector('.quantity-option[data-qty="20"]');
+        else qtyEl = document.querySelector('.quantity-option[data-qty="50"]');
+        if (qtyEl) selectQuantity(qtyEl);
+      }
+
+      async function loadLocation() {
+        try {
+          const res = await fetch(`${API_BASE}/location/for-order`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.status === 401) {
+            localStorage.removeItem("token");
+            window.location.href = "/";
+            return;
+          }
+          const data = await res.json();
+          if (data.success && data.hasLocation) {
+            userLocation = data.location;
+            displayLocation(data.location);
+          } else showNoLocation();
+        } catch (e) {
+          console.error(e);
+          showNoLocation();
+        }
+      }
+
+      function displayLocation(loc) {
+        const icon =
+          loc.label === "Home"
+            ? "fa-home"
+            : loc.label === "Work"
+              ? "fa-briefcase"
+              : "fa-map-pin";
+        const parts = [
+          loc.street,
+          loc.landmark,
+          loc.area,
+          loc.city,
+          loc.pincode,
+        ].filter(Boolean);
+        document.getElementById("locationDetails").innerHTML = `
+                <div class="location-icon"><i class="fas ${icon}"></i></div>
+                <div class="location-text">
+                    <div class="location-label">${loc.label || "Saved Location"}</div>
+                    <div class="location-address">${parts.join(", ") || "GPS Location"}</div>
+                </div>`;
+      }
+
+      function showNoLocation() {
+        document.getElementById("locationCard").innerHTML = `
+                <div class="no-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>Please set your pickup location</p>
+                    <button class="change-btn" onclick="changeLocation()" style="margin:0 auto"><i class="fas fa-location-crosshairs"></i> Set Location</button>
+                </div>`;
+      }
+
+      function changeLocation() {
+        window.location.href = "/location.html?redirect=order";
+      }
+
+      function renderCalendar() {
+        const grid = document.getElementById("calendarGrid");
+        const year = currentMonth.getFullYear(),
+          month = currentMonth.getMonth();
+        document.getElementById("calendarMonth").textContent =
+          `${monthNames[month]} ${year}`;
+        const headers = grid.querySelectorAll(".calendar-day-header");
+        grid.innerHTML = "";
+        headers.forEach((h) => grid.appendChild(h));
+        const firstDay = new Date(year, month, 1),
+          lastDay = new Date(year, month + 1, 0);
+        const startDay = firstDay.getDay(),
+          totalDays = lastDay.getDate();
+        const prevDays = new Date(year, month, 0).getDate();
+        for (let i = startDay - 1; i >= 0; i--) {
+          const d = document.createElement("div");
+          d.className = "calendar-day other-month disabled";
+          d.textContent = prevDays - i;
+          grid.appendChild(d);
+        }
+        for (let i = 1; i <= totalDays; i++) {
+          const d = document.createElement("div");
+          d.className = "calendar-day";
+          d.textContent = i;
+          const dateObj = new Date(year, month, i),
+            dateStr = dateObj.toISOString().split("T")[0];
+          if (dateObj.toDateString() === today.toDateString())
+            d.classList.add("today");
+          if (
+            dateObj < today &&
+            dateObj.toDateString() !== today.toDateString()
+          )
+            d.classList.add("disabled");
+          else d.onclick = () => selectDate(dateStr, d);
+          if (selectedDate === dateStr) d.classList.add("selected");
+          grid.appendChild(d);
+        }
+        const rem = 42 - (startDay + totalDays);
+        for (let i = 1; i <= rem; i++) {
+          const d = document.createElement("div");
+          d.className = "calendar-day other-month disabled";
+          d.textContent = i;
+          grid.appendChild(d);
+        }
+      }
+
+      function prevMonth() {
+        currentMonth.setMonth(currentMonth.getMonth() - 1);
+        renderCalendar();
+      }
+      function nextMonth() {
+        currentMonth.setMonth(currentMonth.getMonth() + 1);
+        renderCalendar();
+      }
+      function goToToday() {
+        currentMonth = new Date();
+        renderCalendar();
+      }
+
+      function selectDate(dateStr, el) {
+        selectedDate = dateStr;
+        document
+          .querySelectorAll(".calendar-day")
+          .forEach((d) => d.classList.remove("selected"));
+        el.classList.add("selected");
+        updateDateTime();
+      }
+
+      function toggleWaste(el) {
+        el.classList.toggle("selected");
+        const type = el.dataset.type,
+          price = parseInt(el.dataset.price);
+        if (el.classList.contains("selected"))
+          selectedWastes.push({ type, price });
+        else selectedWastes = selectedWastes.filter((w) => w.type !== type);
+        updatePricing();
+      }
+
+      function selectQuantity(el) {
+        document
+          .querySelectorAll(".quantity-option")
+          .forEach((e) => e.classList.remove("selected"));
+        el.classList.add("selected");
+        selectedQuantity = parseInt(el.dataset.qty);
+        updatePricing();
+      }
+
+      function selectTime(el) {
+        document
+          .querySelectorAll(".time-slot")
+          .forEach((e) => e.classList.remove("selected"));
+        el.classList.add("selected");
+        selectedTime = el.dataset.time;
+        updateDateTime();
+      }
+
+      function updateDateTime() {
+        if (selectedDate && selectedTime) {
+          const d = new Date(selectedDate + "T00:00:00");
+          const dateStr = `${dayNames[d.getDay()]}, ${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+          const timeMap = {
+            "09:00-12:00": "9 AM - 12 PM",
+            "12:00-15:00": "12 PM - 3 PM",
+            "15:00-18:00": "3 PM - 6 PM",
+            "18:00-21:00": "6 PM - 9 PM",
+          };
+          document.getElementById("dateDisplay").textContent = dateStr;
+          document.getElementById("timeDisplay").textContent =
+            timeMap[selectedTime];
+          document.getElementById("selectedDatetime").classList.add("active");
+        }
+      }
+
+      function updatePricing() {
+        let total = 0;
+        if (selectedWastes.length > 0) {
+          const avg =
+            selectedWastes.reduce((s, w) => s + w.price, 0) /
+            selectedWastes.length;
+          total = Math.round(avg * selectedQuantity);
+        }
+        const pts = Math.round(selectedQuantity * 2);
+        document.getElementById("wasteValue").textContent = `₹${total}`;
+        document.getElementById("ecoPoints").textContent = `+${pts} pts`;
+        document.getElementById("totalEarnings").textContent = `₹${total}`;
+        document.getElementById("bottomTotal").textContent = `₹${total}`;
+      }
+
+      async function placeOrder() {
+        if (!userLocation) {
+          showToast("Please set location", "error");
+          return;
+        }
+        if (!selectedWastes.length) {
+          showToast("Please select waste type", "error");
+          return;
+        }
+        if (!selectedDate) {
+          showToast("Please select date", "error");
+          return;
+        }
+        if (!selectedTime) {
+          showToast("Please select time", "error");
+          return;
+        }
+
+        // Check for scan data (scanId from database required)
+        if (!scanData || !scanData.scanId) {
+          showToast(
+            "Please scan your waste first - photo is required",
+            "error",
+          );
+          setTimeout(() => {
+            window.location.href = "/scan.html";
+          }, 1500);
+          return;
+        }
+
+        document.getElementById("loadingOverlay").classList.add("active");
+        document.getElementById("orderBtn").disabled = true;
+
+        try {
+          const res = await fetch(`${API_BASE}/orders`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              wasteTypes: selectedWastes.map((w) => w.type),
+              estimatedQuantity: selectedQuantity,
+              scheduledDate: selectedDate,
+              scheduledTime: selectedTime,
+              location: userLocation,
+              notes: document.getElementById("notes").value,
+              scanData: scanData, // Include scan data with scanId reference
+            }),
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            document.getElementById("orderId").textContent = data.order.orderId;
+            document
+              .getElementById("loadingOverlay")
+              .classList.remove("active");
+            document.getElementById("successModal").classList.add("active");
+          } else if (
+            data.subscriptionRequired ||
+            data.subscriptionExpired ||
+            data.orderLimitReached
+          ) {
+            // Subscription issues
+            document
+              .getElementById("loadingOverlay")
+              .classList.remove("active");
+            document.getElementById("orderBtn").disabled = false;
+            showSubscriptionError(data);
+          } else if (data.scanRequired) {
+            // Scan required
+            document
+              .getElementById("loadingOverlay")
+              .classList.remove("active");
+            document.getElementById("orderBtn").disabled = false;
+            showToast("Please scan your waste first", "error");
+            setTimeout(() => (window.location.href = "/scan.html"), 1500);
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (e) {
+          document.getElementById("loadingOverlay").classList.remove("active");
+          document.getElementById("orderBtn").disabled = false;
+          showToast(e.message || "Failed to place order", "error");
+        }
+      }
+
+      function showSubscriptionError(data) {
+        let message = data.message;
+        if (data.subscriptionRequired) {
+          message =
+            "Upgrade your subscription to schedule pickups. Scanning is free!";
+        } else if (data.orderLimitReached) {
+          message = `Monthly limit reached (${data.monthlyLimit}). Upgrade for more pickups.`;
+        }
+
+        // Show subscription modal or redirect
+        showToast(message, "error");
+        setTimeout(() => {
+          window.location.href = "/dashboard.html?showSubscription=true";
+        }, 2000);
+      }
+
+      function goBack() {
+        window.history.back();
+      }
+      function goToDashboard() {
+        window.location.href = "/dashboard.html";
+      }
+      function showToast(msg, type) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = "toast " + type;
+        t.style.display = "block";
+        setTimeout(() => (t.style.display = "none"), 3000);
+      }
+    </script>
+  </body>
+</html>

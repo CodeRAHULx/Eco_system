@@ -1,0 +1,2163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoSustain - Road Safety</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        color: #fff;
+        padding-bottom: 80px;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .header h1 {
+        flex: 1;
+        font-size: 1.3rem;
+      }
+
+      .sos-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.85rem;
+        cursor: pointer;
+      }
+
+      /* Container */
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .tab {
+        flex: 1;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.3s;
+      }
+
+      .tab.active {
+        background: linear-gradient(135deg, #f59e0b, #ef4444);
+        color: #fff;
+        border-color: transparent;
+      }
+
+      .tab i {
+        display: block;
+        font-size: 20px;
+        margin-bottom: 5px;
+      }
+
+      /* Stats Row */
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .stat-mini {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .stat-mini .value {
+        font-size: 1.3rem;
+        font-weight: bold;
+      }
+
+      .stat-mini .label {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .stat-mini.danger .value {
+        color: #ef4444;
+      }
+      .stat-mini.warning .value {
+        color: #fbbf24;
+      }
+      .stat-mini.success .value {
+        color: #4ade80;
+      }
+
+      /* Report Form */
+      .report-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-title i {
+        color: #f59e0b;
+      }
+
+      /* Incident Type Grid */
+      .type-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .type-btn {
+        padding: 15px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .type-btn i {
+        font-size: 22px;
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .type-btn span {
+        font-size: 0.7rem;
+      }
+
+      .type-btn.selected {
+        background: rgba(245, 158, 11, 0.2);
+        border-color: #f59e0b;
+      }
+
+      .type-btn.traffic_jam i {
+        color: #ef4444;
+      }
+      .type-btn.construction i {
+        color: #f59e0b;
+      }
+      .type-btn.accident i {
+        color: #dc2626;
+      }
+      .type-btn.pothole i {
+        color: #fbbf24;
+      }
+      .type-btn.flooded_road i {
+        color: #3b82f6;
+      }
+      .type-btn.fallen_tree i {
+        color: #4ade80;
+      }
+      .type-btn.debris i {
+        color: #a1a1aa;
+      }
+      .type-btn.power_outage i {
+        color: #8b5cf6;
+      }
+      .type-btn.fire i {
+        color: #fb923c;
+      }
+
+      /* Form Elements */
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .form-group textarea {
+        resize: none;
+        height: 80px;
+      }
+
+      .form-group select option {
+        background: #1a1a2e;
+      }
+
+      /* Location Display */
+      .location-display {
+        background: rgba(74, 222, 128, 0.1);
+        border: 1px solid rgba(74, 222, 128, 0.3);
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .location-display i {
+        color: #4ade80;
+        font-size: 20px;
+      }
+
+      .location-display .location-text {
+        flex: 1;
+      }
+
+      .location-display .location-text p {
+        font-size: 0.85rem;
+      }
+
+      .location-display .location-text small {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.75rem;
+      }
+
+      .location-display button {
+        background: rgba(74, 222, 128, 0.2);
+        border: none;
+        color: #4ade80;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.8rem;
+      }
+
+      /* Submit Button */
+      .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #f59e0b, #ef4444);
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* Incident Card */
+      .incident-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .incident-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .incident-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+
+      .incident-icon.critical {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+
+      .incident-icon.major {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+      }
+
+      .incident-icon.minor {
+        background: rgba(34, 211, 238, 0.2);
+        color: #22d3ee;
+      }
+
+      .incident-info {
+        flex: 1;
+      }
+
+      .incident-info h4 {
+        font-size: 0.95rem;
+        margin-bottom: 3px;
+        text-transform: capitalize;
+      }
+
+      .incident-info p {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .incident-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+
+      .incident-badge.active {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+
+      .incident-badge.resolved {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+
+      .incident-description {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 12px;
+        line-height: 1.4;
+      }
+
+      .incident-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .incident-distance {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .incident-distance i {
+        margin-right: 5px;
+      }
+
+      .incident-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .action-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s;
+      }
+
+      .action-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .action-btn.confirmed {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+
+      /* Severity Indicator */
+      .severity-bar {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 15px;
+      }
+
+      .severity-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .severity-dot.active.critical {
+        background: #ef4444;
+      }
+      .severity-dot.active.major {
+        background: #f59e0b;
+      }
+      .severity-dot.active.minor {
+        background: #22d3ee;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .empty-state i {
+        font-size: 50px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+      }
+
+      /* Loading */
+      .loading {
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+      }
+
+      .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #f59e0b;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* SOS Modal */
+      .sos-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .sos-modal.active {
+        display: flex;
+      }
+
+      .sos-modal-content {
+        background: #1a1a2e;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        width: 90%;
+        max-width: 350px;
+        border: 2px solid #ef4444;
+      }
+
+      .sos-modal-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(239, 68, 68, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #ef4444;
+        font-size: 30px;
+        animation: pulse-icon 1.5s infinite;
+      }
+
+      @keyframes pulse-icon {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      .sos-modal h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+      }
+
+      .sos-modal p {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 25px;
+      }
+
+      .sos-buttons {
+        display: flex;
+        gap: 12px;
+      }
+
+      .modal-btn {
+        flex: 1;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+      }
+
+      .modal-btn.cancel {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      .modal-btn.confirm {
+        background: #ef4444;
+        color: white;
+      }
+
+      /* Bottom Navigation */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        font-size: 0.75rem;
+      }
+
+      .nav-item i {
+        font-size: 20px;
+      }
+
+      .nav-item.active {
+        color: #f59e0b;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 10px;
+        z-index: 3000;
+        display: none;
+      }
+
+      .toast.success {
+        background: rgba(74, 222, 128, 0.9);
+        color: #000;
+      }
+      .toast.error {
+        background: rgba(239, 68, 68, 0.9);
+      }
+
+      /* Success Modal */
+      .success-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 2500;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .success-modal.active {
+        display: flex;
+      }
+
+      .success-modal-content {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 20px;
+        padding: 25px;
+        width: 100%;
+        max-width: 400px;
+        border: 2px solid #4ade80;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+
+      .success-icon-container {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .success-checkmark {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #4ade80, #22c55e);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        animation: pulse-success 2s ease-in-out infinite;
+      }
+
+      .success-checkmark i {
+        font-size: 40px;
+        color: white;
+      }
+
+      @keyframes pulse-success {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(74, 222, 128, 0); }
+      }
+
+      .success-title {
+        text-align: center;
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #4ade80;
+        margin-bottom: 5px;
+      }
+
+      .success-subtitle {
+        text-align: center;
+        color: rgba(255,255,255,0.7);
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+      }
+
+      .success-detail-box {
+        background: rgba(255,255,255,0.05);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+
+      .success-detail-box h4 {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.6);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .success-detail-box h4 i {
+        color: #f59e0b;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+      }
+
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+
+      .detail-label {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.85rem;
+      }
+
+      .detail-value {
+        color: #fff;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .risk-badge {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
+      .risk-badge.low { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+      .risk-badge.medium { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+      .risk-badge.high { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+      .risk-badge.critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+      .authority-notified {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: rgba(74, 222, 128, 0.1);
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+
+      .authority-notified i {
+        color: #4ade80;
+        font-size: 18px;
+      }
+
+      .authority-notified span {
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.9);
+      }
+
+      .ai-suggestions {
+        margin-top: 10px;
+      }
+
+      .ai-suggestion-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 8px 0;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.8);
+      }
+
+      .ai-suggestion-item i {
+        color: #00d4ff;
+        margin-top: 2px;
+      }
+
+      .share-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .share-btn {
+        flex: 1;
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s;
+      }
+
+      .share-btn.whatsapp { background: #25D366; color: white; }
+      .share-btn.twitter { background: #1DA1F2; color: white; }
+      .share-btn.copy { background: rgba(255,255,255,0.1); color: white; }
+
+      .close-success-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #4ade80, #22c55e);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+      }
+
+      /* AI Features Section */
+      .ai-features-section {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+        border: 1px solid rgba(0, 212, 255, 0.3);
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      .ai-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .ai-header i {
+        font-size: 24px;
+        background: linear-gradient(135deg, #00d4ff, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .ai-header h3 {
+        font-size: 1rem;
+        color: #fff;
+      }
+
+      .ai-tip-card {
+        background: rgba(0,0,0,0.2);
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 10px;
+      }
+
+      .ai-tip-card h4 {
+        font-size: 0.85rem;
+        color: #00d4ff;
+        margin-bottom: 5px;
+      }
+
+      .ai-tip-card p {
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.7);
+        line-height: 1.4;
+      }
+
+      .points-earned {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(234, 179, 8, 0.1));
+        border-radius: 10px;
+        margin-top: 10px;
+      }
+
+      .points-earned i {
+        color: #f59e0b;
+        font-size: 20px;
+      }
+
+      .points-earned span {
+        color: #fbbf24;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <button class="back-btn" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1>
+        <i class="fas fa-shield-alt" style="color: #f59e0b"></i> Road Safety
+      </h1>
+      <button class="sos-btn" onclick="showSOSModal()">
+        <i class="fas fa-exclamation-triangle"></i> SOS
+      </button>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('nearby')">
+          <i class="fas fa-map-marker-alt"></i>
+          Nearby
+        </div>
+        <div class="tab" onclick="showTab('report')">
+          <i class="fas fa-plus"></i>
+          Report
+        </div>
+        <div class="tab" onclick="showTab('all')">
+          <i class="fas fa-list"></i>
+          All
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-mini danger">
+          <div class="value" id="activeCount">0</div>
+          <div class="label">Active</div>
+        </div>
+        <div class="stat-mini warning">
+          <div class="value" id="nearbyCount">0</div>
+          <div class="label">Nearby (5km)</div>
+        </div>
+        <div class="stat-mini success">
+          <div class="value" id="resolvedCount">0</div>
+          <div class="label">Resolved Today</div>
+        </div>
+      </div>
+
+      <!-- AI Safety Features Section -->
+      <div class="ai-features-section" id="aiFeatures">
+        <div class="ai-header">
+          <i class="fas fa-brain"></i>
+          <h3>AI Safety Assistant</h3>
+        </div>
+        <div id="aiTipsContainer">
+          <div class="ai-tip-card">
+            <h4><i class="fas fa-lightbulb"></i> Loading AI Tips...</h4>
+            <p>Getting personalized safety recommendations...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nearby Tab -->
+      <div id="nearbyTab" class="tab-content">
+        <div id="nearbyList">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Report Tab -->
+      <div id="reportTab" class="tab-content" style="display: none">
+        <div class="report-section">
+          <h3 class="section-title">
+            <i class="fas fa-exclamation-circle"></i> Report Incident
+          </h3>
+
+          <div class="form-group">
+            <label>Incident Type</label>
+            <div class="type-grid">
+              <div
+                class="type-btn traffic_jam"
+                onclick="selectType('traffic_jam')"
+              >
+                <i class="fas fa-car"></i>
+                <span>Traffic Jam</span>
+              </div>
+              <div
+                class="type-btn construction"
+                onclick="selectType('construction')"
+              >
+                <i class="fas fa-hard-hat"></i>
+                <span>Construction</span>
+              </div>
+              <div class="type-btn accident" onclick="selectType('accident')">
+                <i class="fas fa-car-crash"></i>
+                <span>Accident</span>
+              </div>
+              <div class="type-btn pothole" onclick="selectType('pothole')">
+                <i class="fas fa-circle"></i>
+                <span>Pothole</span>
+              </div>
+              <div
+                class="type-btn flooded_road"
+                onclick="selectType('flooded_road')"
+              >
+                <i class="fas fa-water"></i>
+                <span>Flooded</span>
+              </div>
+              <div
+                class="type-btn fallen_tree"
+                onclick="selectType('fallen_tree')"
+              >
+                <i class="fas fa-tree"></i>
+                <span>Fallen Tree</span>
+              </div>
+              <div class="type-btn debris" onclick="selectType('debris')">
+                <i class="fas fa-trash"></i>
+                <span>Debris</span>
+              </div>
+              <div
+                class="type-btn power_outage"
+                onclick="selectType('power_outage')"
+              >
+                <i class="fas fa-bolt"></i>
+                <span>Power Out</span>
+              </div>
+              <div class="type-btn fire" onclick="selectType('fire')">
+                <i class="fas fa-fire"></i>
+                <span>Fire</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="location-display" id="locationDisplay">
+            <i class="fas fa-location-crosshairs"></i>
+            <div class="location-text">
+              <p id="locationText">Getting location...</p>
+              <small id="locationCoords">Please enable GPS</small>
+            </div>
+            <button onclick="refreshLocation()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <textarea
+              id="descriptionInput"
+              placeholder="Describe the incident..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Severity</label>
+            <select id="severityInput">
+              <option value="">Auto-detect</option>
+              <option value="minor">Minor - Low impact</option>
+              <option value="major">Major - Significant impact</option>
+              <option value="critical">Critical - Emergency</option>
+            </select>
+          </div>
+
+          <!-- Photo/Video Upload Section -->
+          <div class="form-group">
+            <label
+              ><i
+                class="fas fa-camera"
+                style="color: #f59e0b; margin-right: 5px"
+              ></i>
+              Add Photo/Video Evidence</label
+            >
+            <div
+              class="media-upload-container"
+              style="display: flex; flex-direction: column; gap: 10px"
+            >
+              <div class="media-buttons" style="display: flex; gap: 10px">
+                <button
+                  type="button"
+                  onclick="openCamera()"
+                  style="
+                    flex: 1;
+                    padding: 12px;
+                    background: rgba(74, 222, 128, 0.2);
+                    border: 1px dashed rgba(74, 222, 128, 0.5);
+                    border-radius: 10px;
+                    color: #4ade80;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                  "
+                >
+                  <i class="fas fa-camera"></i> Take Photo
+                </button>
+                <button
+                  type="button"
+                  onclick="document.getElementById('mediaInput').click()"
+                  style="
+                    flex: 1;
+                    padding: 12px;
+                    background: rgba(0, 212, 255, 0.2);
+                    border: 1px dashed rgba(0, 212, 255, 0.5);
+                    border-radius: 10px;
+                    color: #00d4ff;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                  "
+                >
+                  <i class="fas fa-upload"></i> Upload
+                </button>
+              </div>
+              <input
+                type="file"
+                id="mediaInput"
+                accept="image/*,video/*"
+                multiple
+                style="display: none"
+                onchange="handleMediaUpload(event)"
+              />
+
+              <!-- Camera Modal -->
+              <div
+                id="cameraModal"
+                style="
+                  display: none;
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  background: rgba(0, 0, 0, 0.95);
+                  z-index: 3000;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <video
+                  id="cameraVideo"
+                  autoplay
+                  playsinline
+                  style="max-width: 100%; max-height: 70vh; border-radius: 12px"
+                ></video>
+                <div style="margin-top: 20px; display: flex; gap: 15px">
+                  <button
+                    onclick="captureFromCamera()"
+                    style="
+                      padding: 15px 30px;
+                      background: #4ade80;
+                      border: none;
+                      border-radius: 50px;
+                      color: white;
+                      font-size: 16px;
+                      cursor: pointer;
+                    "
+                  >
+                    <i class="fas fa-camera"></i> Capture
+                  </button>
+                  <button
+                    onclick="closeCamera()"
+                    style="
+                      padding: 15px 30px;
+                      background: #ef4444;
+                      border: none;
+                      border-radius: 50px;
+                      color: white;
+                      font-size: 16px;
+                      cursor: pointer;
+                    "
+                  >
+                    <i class="fas fa-times"></i> Cancel
+                  </button>
+                </div>
+              </div>
+              <canvas id="cameraCanvas" style="display: none"></canvas>
+
+              <!-- Preview Container -->
+              <div
+                id="mediaPreview"
+                style="
+                  display: none;
+                  flex-wrap: wrap;
+                  gap: 10px;
+                  margin-top: 10px;
+                "
+              ></div>
+
+              <p
+                style="
+                  font-size: 0.75rem;
+                  color: rgba(255, 255, 255, 0.5);
+                  text-align: center;
+                "
+              >
+                <i class="fas fa-info-circle"></i> Adding photos helps verify
+                the incident faster
+              </p>
+            </div>
+          </div>
+
+          <button class="submit-btn" onclick="reportIncident()" id="reportBtn">
+            <i class="fas fa-paper-plane"></i>
+            Report Incident
+          </button>
+        </div>
+      </div>
+
+      <!-- All Tab -->
+      <div id="allTab" class="tab-content" style="display: none">
+        <div id="allList">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="success-modal" id="successModal">
+      <div class="success-modal-content">
+        <div class="success-icon-container">
+          <div class="success-checkmark">
+            <i class="fas fa-check"></i>
+          </div>
+        </div>
+        <h2 class="success-title">Incident Reported!</h2>
+        <p class="success-subtitle">Your report has been submitted and is now live</p>
+
+        <!-- Location Details -->
+        <div class="success-detail-box">
+          <h4><i class="fas fa-map-marker-alt"></i> Location Details</h4>
+          <div class="detail-row">
+            <span class="detail-label">Coordinates</span>
+            <span class="detail-value" id="successCoords">--</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Incident ID</span>
+            <span class="detail-value" id="successIncidentId">--</span>
+          </div>
+        </div>
+
+        <!-- AI Analysis -->
+        <div class="success-detail-box">
+          <h4><i class="fas fa-robot"></i> AI Risk Analysis</h4>
+          <div class="detail-row">
+            <span class="detail-label">Risk Level</span>
+            <span id="successRiskBadge" class="risk-badge medium">MEDIUM</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Risk Score</span>
+            <span class="detail-value" id="successRiskScore">50/100</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Traffic Impact</span>
+            <span class="detail-value" id="successTrafficImpact">--</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Est. Duration</span>
+            <span class="detail-value" id="successDuration">--</span>
+          </div>
+          <div class="ai-suggestions" id="successSuggestions"></div>
+        </div>
+
+        <!-- Authorities Notified -->
+        <div class="success-detail-box" id="authoritiesBox">
+          <h4><i class="fas fa-shield-alt"></i> Authorities Notified</h4>
+          <div id="authoritiesNotified"></div>
+        </div>
+
+        <!-- Points Earned -->
+        <div class="points-earned" id="pointsEarnedBox">
+          <i class="fas fa-star"></i>
+          <span id="pointsEarnedText">+10 Points Earned!</span>
+        </div>
+
+        <!-- Share Buttons -->
+        <div class="share-buttons">
+          <button class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+            <i class="fab fa-whatsapp"></i> Share
+          </button>
+          <button class="share-btn twitter" onclick="shareOnTwitter()">
+            <i class="fab fa-twitter"></i> Tweet
+          </button>
+          <button class="share-btn copy" onclick="copyIncidentLink()">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        </div>
+
+        <button class="close-success-btn" onclick="closeSuccessModal()">
+          <i class="fas fa-check-circle"></i> Done - View Nearby Incidents
+        </button>
+      </div>
+    </div>
+
+    <!-- SOS Modal -->
+    <div class="sos-modal" id="sosModal">
+      <div class="sos-modal-content">
+        <div class="sos-modal-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3>Emergency SOS</h3>
+        <p>
+          This will alert emergency services and share your location. Are you
+          sure?
+        </p>
+        <div class="sos-buttons">
+          <button class="modal-btn cancel" onclick="closeSOSModal()">
+            Cancel
+          </button>
+          <button class="modal-btn confirm" onclick="sendSOS()">
+            Send SOS
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a class="nav-item" href="dashboard.html">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-item" href="scan.html">
+        <i class="fas fa-camera"></i>
+        <span>Scan</span>
+      </a>
+      <a class="nav-item" href="recycling.html">
+        <i class="fas fa-recycle"></i>
+        <span>Recycle</span>
+      </a>
+      <a class="nav-item active" href="incidents.html">
+        <i class="fas fa-shield-alt"></i>
+        <span>Safety</span>
+      </a>
+      <a class="nav-item" href="order.html">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Orders</span>
+      </a>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const API_BASE = "/api";
+      let token = localStorage.getItem("token");
+      let userLocation = null;
+      let selectedType = null;
+      let uploadedMedia = []; // Store uploaded photos/videos
+      let cameraStream = null; // Store camera stream
+      let lastReportedIncident = null; // Store last reported incident for sharing
+
+      document.addEventListener("DOMContentLoaded", () => {
+        getUserLocation();
+        loadAnalytics();
+        loadAISafetyTips();
+      });
+
+      // Load AI Safety Tips
+      async function loadAISafetyTips() {
+        const container = document.getElementById("aiTipsContainer");
+        
+        try {
+          const response = await fetch(`${API_BASE}/ai/safety-tips`);
+          const data = await response.json();
+          
+          if (data.success && data.tips) {
+            container.innerHTML = data.tips.map(tip => `
+              <div class="ai-tip-card">
+                <h4><i class="fas fa-${tip.icon || 'lightbulb'}"></i> ${tip.title}</h4>
+                <p>${tip.description}</p>
+              </div>
+            `).join('');
+          } else {
+            // Use default tips if API fails
+            showDefaultAITips(container);
+          }
+        } catch (error) {
+          console.error("Error loading AI tips:", error);
+          showDefaultAITips(container);
+        }
+      }
+
+      function showDefaultAITips(container) {
+        const defaultTips = [
+          {
+            icon: "route",
+            title: "AI Route Optimizer",
+            description: "Based on current incidents, avoid main highway routes. Consider alternate paths for 15% faster travel."
+          },
+          {
+            icon: "clock",
+            title: "Peak Time Alert",
+            description: "Incident reports typically spike between 5-7 PM. Plan your travel accordingly."
+          },
+          {
+            icon: "shield-alt",
+            title: "Safety Score: Good",
+            description: "Your area has low incident density. Stay vigilant and report any hazards you encounter."
+          }
+        ];
+        
+        container.innerHTML = defaultTips.map(tip => `
+          <div class="ai-tip-card">
+            <h4><i class="fas fa-${tip.icon}"></i> ${tip.title}</h4>
+            <p>${tip.description}</p>
+          </div>
+        `).join('');
+      }
+
+      // Show success modal with incident details
+      function showSuccessModal(incidentData) {
+        lastReportedIncident = incidentData;
+        
+        const modal = document.getElementById("successModal");
+        const incident = incidentData.incident;
+        const aiAnalysis = incident.aiAnalysis || {};
+        
+        // Set location
+        if (incident.location) {
+          document.getElementById("successCoords").textContent = 
+            `${Number(incident.location.lat).toFixed(4)}, ${Number(incident.location.lng).toFixed(4)}`;
+        }
+        
+        // Set incident ID
+        document.getElementById("successIncidentId").textContent = 
+          incident.incidentId || incident.id || "Generated";
+        
+        // Set AI Analysis
+        const riskLevel = aiAnalysis.riskLevel || "medium";
+        const riskBadge = document.getElementById("successRiskBadge");
+        riskBadge.textContent = riskLevel.toUpperCase();
+        riskBadge.className = `risk-badge ${riskLevel}`;
+        
+        document.getElementById("successRiskScore").textContent = 
+          `${aiAnalysis.riskScore || 50}/100`;
+        document.getElementById("successTrafficImpact").textContent = 
+          aiAnalysis.trafficImpact ? aiAnalysis.trafficImpact.replace('_', ' ').toUpperCase() : "MINOR";
+        document.getElementById("successDuration").textContent = 
+          aiAnalysis.predictedDuration || "~30 minutes";
+        
+        // Set AI Suggestions
+        const suggestionsContainer = document.getElementById("successSuggestions");
+        if (aiAnalysis.suggestions && aiAnalysis.suggestions.length > 0) {
+          suggestionsContainer.innerHTML = `
+            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 10px;">AI Recommendations:</p>
+            ${aiAnalysis.suggestions.slice(0, 3).map(s => `
+              <div class="ai-suggestion-item">
+                <i class="fas fa-check-circle"></i>
+                <span>${s}</span>
+              </div>
+            `).join('')}
+          `;
+        }
+        
+        // Set Authorities Notified
+        const authBox = document.getElementById("authoritiesNotified");
+        const authorities = incident.authoritiesNotified || {};
+        let authHTML = '';
+        
+        if (authorities.police?.notified) {
+          authHTML += `
+            <div class="authority-notified">
+              <i class="fas fa-shield-alt"></i>
+              <span>Police Department - Notified ✓</span>
+            </div>
+          `;
+        }
+        if (authorities.medical?.notified) {
+          authHTML += `
+            <div class="authority-notified">
+              <i class="fas fa-ambulance"></i>
+              <span>Medical Emergency Services - Notified ✓</span>
+            </div>
+          `;
+        }
+        if (aiAnalysis.requiresEmergencyResponse) {
+          authHTML += `
+            <div class="authority-notified">
+              <i class="fas fa-bell"></i>
+              <span>Emergency Response Team - Alerted ✓</span>
+            </div>
+          `;
+        }
+        
+        // Default notification for non-emergency
+        if (!authHTML) {
+          authHTML = `
+            <div class="authority-notified">
+              <i class="fas fa-users"></i>
+              <span>Nearby users within 5km - Alerted ✓</span>
+            </div>
+            <div class="authority-notified">
+              <i class="fas fa-city"></i>
+              <span>Municipal Traffic Control - Notified ✓</span>
+            </div>
+          `;
+        }
+        authBox.innerHTML = authHTML;
+        
+        // Set Points Earned
+        const pointsEarned = incidentData.pointsEarned || 10;
+        document.getElementById("pointsEarnedText").textContent = `+${pointsEarned} Points Earned!`;
+        
+        // Show/hide points box based on login status
+        document.getElementById("pointsEarnedBox").style.display = 
+          token ? "flex" : "none";
+        
+        modal.classList.add("active");
+      }
+
+      function closeSuccessModal() {
+        document.getElementById("successModal").classList.remove("active");
+        loadNearbyIncidents();
+        loadAnalytics();
+        
+        // Switch to nearby tab
+        document.querySelectorAll(".tab").forEach((t, i) => {
+          t.classList.remove("active");
+          if (i === 0) t.classList.add("active");
+        });
+        document.querySelectorAll(".tab-content").forEach((c) => (c.style.display = "none"));
+        document.getElementById("nearbyTab").style.display = "block";
+      }
+
+      // Share functions
+      function shareOnWhatsApp() {
+        if (!lastReportedIncident) return;
+        const incident = lastReportedIncident.incident;
+        const type = incident.type?.replace(/_/g, ' ').toUpperCase() || "INCIDENT";
+        const coords = incident.location ? `${incident.location.lat},${incident.location.lng}` : "";
+        const mapsLink = coords ? `https://maps.google.com/?q=${coords}` : "";
+        
+        const message = `🚨 ROAD ALERT: ${type}%0A%0A📍 Location: ${mapsLink}%0A⚠️ Severity: ${incident.severity?.toUpperCase() || 'MEDIUM'}%0A%0AStay safe and avoid this area if possible!%0A%0AReported via EcoSustain Road Safety`;
+        
+        window.open(`https://wa.me/?text=${message}`, '_blank');
+      }
+
+      function shareOnTwitter() {
+        if (!lastReportedIncident) return;
+        const incident = lastReportedIncident.incident;
+        const type = incident.type?.replace(/_/g, ' ').toUpperCase() || "INCIDENT";
+        
+        const tweet = `🚨 Road Alert: ${type} reported in my area. Stay safe everyone! #RoadSafety #TrafficAlert`;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`, '_blank');
+      }
+
+      function copyIncidentLink() {
+        if (!lastReportedIncident) return;
+        const incident = lastReportedIncident.incident;
+        const coords = incident.location ? `${incident.location.lat},${incident.location.lng}` : "";
+        const link = `https://maps.google.com/?q=${coords}`;
+        
+        navigator.clipboard.writeText(link).then(() => {
+          showToast("Location link copied!", "success");
+        }).catch(() => {
+          showToast("Failed to copy", "error");
+        });
+      }
+
+      // Open camera modal
+      async function openCamera() {
+        try {
+          const modal = document.getElementById("cameraModal");
+          const video = document.getElementById("cameraVideo");
+
+          // Request camera access
+          cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }, // Use back camera
+            audio: false,
+          });
+
+          video.srcObject = cameraStream;
+          modal.style.display = "flex";
+        } catch (error) {
+          console.error("Camera error:", error);
+          showToast(
+            "Could not access camera. Please use Upload instead.",
+            "error",
+          );
+        }
+      }
+
+      // Capture photo from camera
+      function captureFromCamera() {
+        const video = document.getElementById("cameraVideo");
+        const canvas = document.getElementById("cameraCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Set canvas size to video size
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        // Draw video frame to canvas
+        ctx.drawImage(video, 0, 0);
+
+        // Get image data
+        const imageData = canvas.toDataURL("image/jpeg", 0.8);
+
+        // Add to uploaded media
+        addMediaToPreview(imageData, "image");
+
+        // Close camera
+        closeCamera();
+
+        showToast("Photo captured!", "success");
+      }
+
+      // Close camera modal
+      function closeCamera() {
+        const modal = document.getElementById("cameraModal");
+        const video = document.getElementById("cameraVideo");
+
+        // Stop camera stream
+        if (cameraStream) {
+          cameraStream.getTracks().forEach((track) => track.stop());
+          cameraStream = null;
+        }
+
+        video.srcObject = null;
+        modal.style.display = "none";
+      }
+
+      // Add media to preview
+      function addMediaToPreview(dataUrl, type) {
+        if (uploadedMedia.length >= 5) {
+          showToast("Maximum 5 files allowed", "error");
+          return;
+        }
+
+        const mediaData = {
+          data: dataUrl,
+          type: type,
+          name: `capture_${Date.now()}.jpg`,
+        };
+        uploadedMedia.push(mediaData);
+
+        const previewContainer = document.getElementById("mediaPreview");
+        previewContainer.style.display = "flex";
+
+        const previewItem = document.createElement("div");
+        previewItem.style.cssText =
+          "position: relative; width: 80px; height: 80px; border-radius: 8px; overflow: hidden;";
+        previewItem.innerHTML = `
+          <img src="${dataUrl}" style="width: 100%; height: 100%; object-fit: cover;">
+          <button onclick="removeMedia(${uploadedMedia.length - 1}, this.parentElement)" style="position: absolute; top: 2px; right: 2px; background: rgba(239, 68, 68, 0.9); border: none; border-radius: 50%; width: 20px; height: 20px; color: white; cursor: pointer; font-size: 10px;">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        previewContainer.appendChild(previewItem);
+      }
+
+      // Handle media upload from file input
+      function handleMediaUpload(event) {
+        const files = event.target.files;
+        if (!files.length) return;
+
+        for (let file of files) {
+          if (uploadedMedia.length >= 5) {
+            showToast("Maximum 5 files allowed", "error");
+            break;
+          }
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const type = file.type.startsWith("video") ? "video" : "image";
+            addMediaToPreview(e.target.result, type);
+          };
+          reader.readAsDataURL(file);
+        }
+
+        // Reset input
+        event.target.value = "";
+      }
+
+      // Remove uploaded media
+      function removeMedia(index, element) {
+        uploadedMedia.splice(index, 1);
+        element.remove();
+        if (uploadedMedia.length === 0) {
+          document.getElementById("mediaPreview").style.display = "none";
+        }
+      }
+
+      // Get user location
+      function getUserLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              document.getElementById("locationCoords").textContent =
+                `${userLocation.lat.toFixed(6)}, ${userLocation.lng.toFixed(6)}`;
+              document.getElementById("locationText").textContent =
+                "Location acquired ✓";
+
+              loadNearbyIncidents();
+            },
+            (error) => {
+              document.getElementById("locationText").textContent =
+                "Location unavailable";
+              document.getElementById("locationCoords").textContent =
+                "Please enable GPS";
+            },
+            { enableHighAccuracy: true },
+          );
+        }
+      }
+
+      function refreshLocation() {
+        document.getElementById("locationText").textContent = "Updating...";
+        getUserLocation();
+      }
+
+      // Tab switching
+      function showTab(tabName) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        event.target.closest(".tab").classList.add("active");
+
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => (c.style.display = "none"));
+        document.getElementById(`${tabName}Tab`).style.display = "block";
+
+        if (tabName === "nearby") loadNearbyIncidents();
+        if (tabName === "all") loadAllIncidents();
+      }
+
+      // Select incident type
+      function selectType(type) {
+        document
+          .querySelectorAll(".type-btn")
+          .forEach((btn) => btn.classList.remove("selected"));
+        document.querySelector(`.type-btn.${type}`).classList.add("selected");
+        selectedType = type;
+      }
+
+      // Load analytics
+      async function loadAnalytics() {
+        try {
+          const response = await fetch(`${API_BASE}/incidents/analytics`);
+          const data = await response.json();
+
+          if (data.success && data.analytics) {
+            document.getElementById("activeCount").textContent =
+              data.analytics.totalActive || 0;
+            document.getElementById("resolvedCount").textContent =
+              data.analytics.resolvedToday || 0;
+          }
+        } catch (error) {
+          console.error("Error loading analytics:", error);
+        }
+      }
+
+      // Load nearby incidents
+      async function loadNearbyIncidents() {
+        if (!userLocation) {
+          document.getElementById("nearbyList").innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-location-arrow"></i>
+                        <p>Enable location to see nearby incidents</p>
+                    </div>
+                `;
+          return;
+        }
+
+        const container = document.getElementById("nearbyList");
+        container.innerHTML =
+          '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+          const response = await fetch(
+            `${API_BASE}/incidents/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=10`,
+          );
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch nearby incidents');
+          }
+          
+          const data = await response.json();
+
+          if (data.success && data.incidents && data.incidents.length > 0) {
+            document.getElementById("nearbyCount").textContent =
+              data.incidents.length;
+            container.innerHTML = data.incidents
+              .map((incident) => renderIncidentCard(incident))
+              .join("");
+          } else {
+            document.getElementById("nearbyCount").textContent = "0";
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle" style="color: #4ade80;"></i>
+                            <p>No incidents nearby. Roads are clear! 🎉</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          console.error('Error loading nearby incidents:', error);
+          container.innerHTML =
+            '<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i><p>Error loading incidents. Please try again.</p></div>';
+        }
+      }
+
+      // Load all incidents
+      async function loadAllIncidents() {
+        const container = document.getElementById("allList");
+        container.innerHTML =
+          '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+          const response = await fetch(`${API_BASE}/incidents`);
+          
+          if (!response.ok) {
+            throw new Error('Failed to fetch incidents');
+          }
+          
+          const data = await response.json();
+
+          if (data.success && data.incidents && data.incidents.length > 0) {
+            container.innerHTML = data.incidents
+              .map((incident) => renderIncidentCard(incident))
+              .join("");
+          } else {
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-shield-alt"></i>
+                            <p>No incidents reported yet</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          console.error('Error loading all incidents:', error);
+          container.innerHTML =
+            '<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i><p>Error loading incidents. Please try again.</p></div>';
+        }
+      }
+
+      // Render incident card
+      function renderIncidentCard(incident) {
+        const typeIcons = {
+          traffic_jam: "car",
+          construction: "hard-hat",
+          accident: "car-crash",
+          pothole: "circle",
+          flooded_road: "water",
+          fallen_tree: "tree",
+          debris: "trash",
+          power_outage: "bolt",
+          fire: "fire",
+          violence: "exclamation-triangle",
+          animal_on_road: "paw",
+          other: "exclamation-circle",
+        };
+
+        const icon = typeIcons[incident.type] || "exclamation-triangle";
+        const severityClass = incident.severity || "medium";
+        
+        // Handle both distance (from backend) and distance_km field names
+        const dist = incident.distance || incident.distance_km;
+        let distanceText = "";
+        if (dist !== undefined && dist !== null) {
+          distanceText = `${Number(dist).toFixed(1)} km away`;
+        } else if (incident.location && incident.location.lat && incident.location.lng) {
+          // Calculate distance from user location if available
+          if (userLocation) {
+            const calcDist = calculateDistance(
+              userLocation.lat, userLocation.lng,
+              incident.location.lat, incident.location.lng
+            );
+            distanceText = `${calcDist.toFixed(1)} km away`;
+          } else {
+            distanceText = `📍 ${Number(incident.location.lat).toFixed(4)}, ${Number(incident.location.lng).toFixed(4)}`;
+          }
+        }
+
+        // Format incident type for display
+        const typeDisplay = incident.type.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+
+        return `
+                <div class="incident-card">
+                    <div class="incident-header">
+                        <div class="incident-icon ${severityClass}">
+                            <i class="fas fa-${icon}"></i>
+                        </div>
+                        <div class="incident-info">
+                            <h4>${typeDisplay}</h4>
+                            <p>${formatTime(incident.createdAt)}</p>
+                        </div>
+                        <span class="incident-badge ${incident.status}">${incident.status}</span>
+                    </div>
+                    ${incident.description ? `<p class="incident-description">${incident.description}</p>` : ""}
+                    <div class="incident-footer">
+                        <span class="incident-distance" style="cursor: pointer;" onclick="showOnMap('${incident._id}')">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${distanceText || "View on Map"}
+                        </span>
+                        <div class="incident-actions">
+                            <button class="action-btn ${incident.userConfirmed ? "confirmed" : ""}" 
+                                    onclick="confirmIncident('${incident._id}')">
+                                <i class="fas fa-check"></i>
+                                ${incident.confirmations || 0}
+                            </button>
+                            <button class="action-btn" onclick="showOnMap('${incident._id}')">
+                                <i class="fas fa-map"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+
+      // Calculate distance between two points using Haversine formula
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      }
+
+      // Report incident
+      async function reportIncident() {
+        if (!selectedType) {
+          showToast("Please select an incident type", "error");
+          return;
+        }
+
+        if (!userLocation) {
+          showToast("Location required. Please enable GPS.", "error");
+          return;
+        }
+
+        const btn = document.getElementById("reportBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing with AI...';
+
+        try {
+          const headers = { "Content-Type": "application/json" };
+          if (token) headers["Authorization"] = `Bearer ${token}`;
+
+          const requestBody = {
+            type: selectedType,
+            location: {
+              lat: userLocation.lat,
+              lng: userLocation.lng,
+            },
+            description: document.getElementById("descriptionInput").value || "Incident reported via app",
+            severity: document.getElementById("severityInput").value || undefined,
+            media: uploadedMedia.length > 0
+              ? {
+                  photos: uploadedMedia.filter((m) => m.type === "image").map((m) => m.data),
+                  video: uploadedMedia.find((m) => m.type === "video")?.data || null,
+                }
+              : { photos: [], video: null },
+          };
+
+          console.log("Sending incident report:", requestBody);
+
+          const response = await fetch(`${API_BASE}/incidents/report`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(requestBody),
+          });
+
+          const data = await response.json();
+          console.log("Server response:", data);
+
+          if (!response.ok) {
+            // Handle specific error messages
+            if (data.mediaRequired) {
+              showToast("📷 Please add a photo or video of the incident", "error");
+            } else {
+              throw new Error(data.message || `Server error: ${response.status}`);
+            }
+            return;
+          }
+
+          if (data.success) {
+            // Reset form first
+            selectedType = null;
+            document.querySelectorAll(".type-btn").forEach((btn) => btn.classList.remove("selected"));
+            document.getElementById("descriptionInput").value = "";
+            document.getElementById("severityInput").value = "";
+
+            // Clear uploaded media
+            uploadedMedia = [];
+            document.getElementById("mediaPreview").innerHTML = "";
+            document.getElementById("mediaPreview").style.display = "none";
+
+            // Show success modal with all details
+            showSuccessModal(data);
+          } else {
+            showToast(data.message || "Failed to report incident", "error");
+          }
+        } catch (error) {
+          console.error("Report incident error:", error);
+          showToast(error.message || "Failed to submit. Check your connection.", "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-paper-plane"></i> Report Incident';
+        }
+      }
+
+      // Confirm incident
+      async function confirmIncident(incidentId) {
+        if (!token) {
+          showToast("Please login to confirm incidents", "error");
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `${API_BASE}/incidents/${incidentId}/confirm`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+
+          const data = await response.json();
+
+          if (data.success) {
+            showToast("Incident confirmed!", "success");
+            loadNearbyIncidents();
+          } else {
+            showToast(data.message || "Failed to confirm", "error");
+          }
+        } catch (error) {
+          showToast("Network error", "error");
+        }
+      }
+
+      function showOnMap(incidentId) {
+        // Find the incident to get its location
+        fetch(`${API_BASE}/incidents/${incidentId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.incident && data.incident.location) {
+              const loc = data.incident.location;
+              // Open Google Maps with directions
+              const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`;
+              window.open(mapsUrl, '_blank');
+            } else {
+              showToast("Location not available", "error");
+            }
+          })
+          .catch(err => {
+            showToast("Failed to get location", "error");
+          });
+      }
+
+      // SOS functions
+      function showSOSModal() {
+        document.getElementById("sosModal").classList.add("active");
+      }
+
+      function closeSOSModal() {
+        document.getElementById("sosModal").classList.remove("active");
+      }
+
+      async function sendSOS() {
+        closeSOSModal();
+
+        if (!userLocation) {
+          showToast("Getting your location...", "info");
+          try {
+            const position = await new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000,
+              });
+            });
+            userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+          } catch (error) {
+            showToast(
+              "Cannot get location. Please call emergency services.",
+              "error",
+            );
+            return;
+          }
+        }
+
+        try {
+          const headers = { "Content-Type": "application/json" };
+          if (token) headers["Authorization"] = `Bearer ${token}`;
+
+          const response = await fetch(`${API_BASE}/incidents/emergency-sos`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              location: {
+                lat: userLocation.lat,
+                lng: userLocation.lng,
+              },
+            }),
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            showToast("🚨 Emergency SOS sent! Help is on the way.", "success");
+          } else {
+            showToast(
+              "Failed to send SOS. Please call emergency services.",
+              "error",
+            );
+          }
+        } catch (error) {
+          showToast(
+            "Network error. Please call emergency services directly.",
+            "error",
+          );
+        }
+      }
+
+      function formatTime(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        return date.toLocaleDateString();
+      }
+
+      function showToast(message, type = "info") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast " + type;
+        toast.style.display = "block";
+        setTimeout(() => (toast.style.display = "none"), 3000);
+      }
+    </script>
+  </body>
+</html>

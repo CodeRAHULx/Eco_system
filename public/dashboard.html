@@ -1,0 +1,2266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoSustain - Dashboard</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        color: #fff;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo i {
+        font-size: 28px;
+        color: #4ade80;
+      }
+
+      .logo h1 {
+        font-size: 1.5rem;
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4ade80, #22d3ee);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .notification-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        position: relative;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 50%;
+      }
+
+      /* Main Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Location Bar */
+      .location-bar {
+        background: rgba(74, 222, 128, 0.1);
+        border: 1px solid rgba(74, 222, 128, 0.3);
+        border-radius: 12px;
+        padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .location-bar:hover {
+        background: rgba(74, 222, 128, 0.15);
+        border-color: #4ade80;
+      }
+
+      .location-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(74, 222, 128, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4ade80;
+        font-size: 18px;
+      }
+
+      .location-text {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .location-label {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .location-address {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;
+      }
+
+      /* Welcome Section */
+      .welcome-section {
+        margin-bottom: 30px;
+      }
+
+      .welcome-section h2 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+      }
+
+      .welcome-section p {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 40px rgba(74, 222, 128, 0.2);
+      }
+
+      .stat-card .icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      .stat-card.eco .icon {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+      .stat-card.points .icon {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+      .stat-card.co2 .icon {
+        background: rgba(34, 211, 238, 0.2);
+        color: #22d3ee;
+      }
+      .stat-card.recycled .icon {
+        background: rgba(168, 85, 247, 0.2);
+        color: #a855f7;
+      }
+
+      .stat-card h3 {
+        font-size: 2rem;
+        margin-bottom: 5px;
+      }
+
+      .stat-card p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.9rem;
+      }
+
+      /* Quick Actions */
+      .section-title {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-title i {
+        color: #4ade80;
+      }
+
+      .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+
+      .action-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 25px 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        color: #fff;
+      }
+
+      .action-btn:hover {
+        background: rgba(74, 222, 128, 0.1);
+        border-color: #4ade80;
+        transform: scale(1.05);
+      }
+
+      .action-btn i {
+        font-size: 30px;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      .action-btn.scan i {
+        color: #4ade80;
+      }
+      .action-btn.schedule i {
+        color: #22d3ee;
+      }
+      .action-btn.track i {
+        color: #fbbf24;
+      }
+      .action-btn.rewards i {
+        color: #a855f7;
+      }
+      .action-btn.ai i {
+        color: #f472b6;
+      }
+      .action-btn.community i {
+        color: #fb923c;
+      }
+      .action-btn.safety i {
+        color: #ef4444;
+      }
+      .action-btn.facilities i {
+        color: #06b6d4;
+      }
+      .action-btn.recycle i {
+        color: #3b82f6;
+      }
+
+      /* SOS Button */
+      .sos-button {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: none;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        z-index: 99;
+        animation: pulse-sos 2s infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @keyframes pulse-sos {
+        0%,
+        100% {
+          transform: scale(1);
+          box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+        }
+      }
+
+      /* Incident Alert */
+      .incident-alert {
+        background: linear-gradient(
+          135deg,
+          rgba(251, 191, 36, 0.2),
+          rgba(239, 68, 68, 0.1)
+        );
+        border: 1px solid rgba(251, 191, 36, 0.4);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .incident-alert:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(251, 191, 36, 0.3),
+          rgba(239, 68, 68, 0.15)
+        );
+      }
+
+      .incident-alert .alert-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(251, 191, 36, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fbbf24;
+        font-size: 18px;
+      }
+
+      .incident-alert .alert-content {
+        flex: 1;
+      }
+
+      .incident-alert h4 {
+        font-size: 0.9rem;
+        margin-bottom: 3px;
+      }
+
+      .incident-alert p {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* SOS Modal */
+      .sos-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .sos-modal.active {
+        display: flex;
+      }
+
+      .sos-modal-content {
+        background: #1a1a2e;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        width: 90%;
+        max-width: 350px;
+        border: 2px solid #ef4444;
+      }
+
+      .sos-modal-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(239, 68, 68, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #ef4444;
+        font-size: 30px;
+      }
+
+      .sos-modal h3 {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+      }
+
+      .sos-modal p {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 25px;
+        font-size: 0.9rem;
+      }
+
+      .sos-buttons {
+        display: flex;
+        gap: 12px;
+      }
+
+      .sos-btn {
+        flex: 1;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.3s;
+      }
+
+      .sos-btn.cancel {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+
+      .sos-btn.confirm {
+        background: #ef4444;
+        color: white;
+      }
+
+      /* Recent Activity */
+      .activity-list {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+      }
+
+      .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: background 0.3s;
+      }
+
+      .activity-item:last-child {
+        border-bottom: none;
+      }
+
+      .activity-item:hover {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .activity-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-size: 18px;
+      }
+
+      .activity-icon.scan {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+      .activity-icon.pickup {
+        background: rgba(34, 211, 238, 0.2);
+        color: #22d3ee;
+      }
+      .activity-icon.reward {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+
+      .activity-details {
+        flex: 1;
+      }
+
+      .activity-details h4 {
+        font-size: 0.95rem;
+        margin-bottom: 3px;
+      }
+
+      .activity-details p {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .activity-points {
+        font-weight: bold;
+        color: #4ade80;
+      }
+
+      /* Level Progress */
+      .level-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 30px;
+      }
+
+      .level-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .level-info h3 {
+        font-size: 1.2rem;
+        color: #4ade80;
+      }
+
+      .level-info p {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .level-badge {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4ade80, #22d3ee);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .progress-bar {
+        height: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 5px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        border-radius: 5px;
+        transition: width 0.5s;
+      }
+
+      .progress-text {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Profile Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal.active {
+        display: flex;
+      }
+
+      .modal-content {
+        background: #1a1a2e;
+        border-radius: 20px;
+        padding: 30px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+
+      .modal-header h2 {
+        font-size: 1.5rem;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #4ade80;
+      }
+
+      .save-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        border: none;
+        border-radius: 10px;
+        color: #000;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s;
+      }
+
+      .save-btn:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 20px rgba(74, 222, 128, 0.4);
+      }
+
+      .logout-btn {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid #ef4444;
+        color: #ef4444;
+        margin-top: 15px;
+      }
+
+      .logout-btn:hover {
+        background: rgba(239, 68, 68, 0.3);
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .empty-state i {
+        font-size: 50px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+      }
+
+      /* Loading */
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #4ade80;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 15px 25px;
+        border-radius: 10px;
+        z-index: 2000;
+        display: none;
+      }
+
+      .toast.success {
+        background: rgba(74, 222, 128, 0.9);
+        color: #000;
+      }
+
+      .toast.error {
+        background: rgba(239, 68, 68, 0.9);
+      }
+
+      /* Bottom Navigation */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
+
+      .nav-item i {
+        font-size: 20px;
+      }
+
+      .nav-item.active {
+        color: #4ade80;
+      }
+
+      /* Orders Section */
+      .orders-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 15px;
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .order-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+      }
+
+      .order-tab {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.7);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.3s;
+      }
+
+      .order-tab:hover, .order-tab.active {
+        background: rgba(74, 222, 128, 0.2);
+        border-color: #4ade80;
+        color: #4ade80;
+      }
+
+      .orders-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .order-card {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .order-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(74, 222, 128, 0.3);
+      }
+
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .order-id {
+        font-weight: 600;
+        color: #4ade80;
+        font-size: 0.9rem;
+      }
+
+      .order-status {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .order-status.pending {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+
+      .order-status.confirmed {
+        background: rgba(34, 211, 238, 0.2);
+        color: #22d3ee;
+      }
+
+      .order-status.assigned, .order-status.in_transit {
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+      }
+
+      .order-status.completed {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+
+      .order-status.cancelled {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+
+      .order-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .order-details span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .order-details i {
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      .order-waste-types {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .waste-tag {
+        background: rgba(74, 222, 128, 0.15);
+        color: #4ade80;
+        padding: 3px 10px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+      }
+
+      .order-worker {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .worker-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4ade80, #22d3ee);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .worker-info {
+        flex: 1;
+      }
+
+      .worker-name {
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .worker-phone {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .track-btn {
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        border: none;
+        color: #000;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .no-orders {
+        text-align: center;
+        padding: 30px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .no-orders i {
+        font-size: 40px;
+        margin-bottom: 10px;
+        opacity: 0.5;
+      }
+
+      .no-orders a {
+        color: #4ade80;
+        text-decoration: none;
+      }
+
+      /* Subscription Card */
+      .subscription-card {
+        background: linear-gradient(
+          135deg,
+          rgba(251, 191, 36, 0.1),
+          rgba(74, 222, 128, 0.1)
+        );
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        margin-bottom: 30px;
+      }
+
+      .sub-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .sub-info h3 {
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+      }
+
+      .sub-info p {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .sub-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .sub-badge.free {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      .sub-badge.basic {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+      .sub-badge.premium {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+      .sub-badge.enterprise {
+        background: rgba(168, 85, 247, 0.2);
+        color: #a855f7;
+      }
+
+      .sub-details {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+        padding: 10px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .sub-stat {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sub-stat .label {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .sub-stat .value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #4ade80;
+      }
+
+      .upgrade-btn {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        color: #1a1a2e;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s;
+      }
+
+      .upgrade-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+      }
+
+      /* Subscription Modal */
+      .subscription-modal .subscription-content {
+        max-width: 500px;
+      }
+
+      .plans-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 20px 0;
+      }
+
+      .plan-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .plan-card:hover {
+        border-color: #4ade80;
+        transform: translateY(-2px);
+      }
+
+      .plan-card.popular {
+        border-color: #fbbf24;
+        position: relative;
+      }
+
+      .plan-card.popular::before {
+        content: "MOST POPULAR";
+        position: absolute;
+        top: -10px;
+        right: 15px;
+        background: #fbbf24;
+        color: #1a1a2e;
+        padding: 4px 10px;
+        border-radius: 10px;
+        font-size: 0.65rem;
+        font-weight: 700;
+      }
+
+      .plan-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .plan-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .plan-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #4ade80;
+      }
+
+      .plan-price span {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .plan-features {
+        list-style: none;
+      }
+
+      .plan-features li {
+        padding: 5px 0;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .plan-features li i {
+        color: #4ade80;
+        margin-right: 8px;
+      }
+
+      .plan-btn {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        color: #1a1a2e;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: all 0.3s;
+      }
+
+      .plan-btn:hover {
+        opacity: 0.9;
+      }
+
+      .plan-btn:disabled {
+        background: rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.5);
+        cursor: not-allowed;
+      }
+
+      .payment-note {
+        text-align: center;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+        padding: 10px 0;
+      }
+
+      .payment-note i {
+        margin-right: 5px;
+        color: #4ade80;
+      }
+
+      /* Responsive */
+      @media (max-width: 600px) {
+        .header h1 {
+          font-size: 1.2rem;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .stat-card h3 {
+          font-size: 1.5rem;
+        }
+        .container {
+          padding-bottom: 80px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <i class="fas fa-leaf"></i>
+        <h1>EcoSustain</h1>
+      </div>
+      <div class="header-right">
+        <button class="notification-btn" id="notificationBtn">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" id="notifBadge">0</span>
+        </button>
+        <div class="user-info" id="userInfo">
+          <div class="avatar" id="userAvatar">U</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+      <!-- Location Bar -->
+      <div
+        class="location-bar"
+        id="locationBar"
+        onclick="window.location.href = '/location.html'"
+      >
+        <div class="location-icon">
+          <i class="fas fa-location-dot"></i>
+        </div>
+        <div class="location-text">
+          <span class="location-label">Delivering to</span>
+          <span class="location-address" id="userLocation"
+            >Set your location →</span
+          >
+        </div>
+        <i class="fas fa-chevron-right"></i>
+      </div>
+
+      <!-- Welcome Section -->
+      <div class="welcome-section">
+        <h2>Welcome back, <span id="userName">User</span>! 👋</h2>
+        <p>Let's make the world greener today.</p>
+      </div>
+
+      <!-- Level Progress -->
+      <div class="level-card">
+        <div class="level-header">
+          <div class="level-info">
+            <h3>Level <span id="userLevel">1</span></h3>
+            <p>Eco Warrior</p>
+          </div>
+          <div class="level-badge" id="levelBadge">1</div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text">
+          <span><span id="currentPoints">0</span> points</span>
+          <span><span id="pointsToNext">100</span> to next level</span>
+        </div>
+      </div>
+
+      <!-- Subscription Card -->
+      <div class="subscription-card" id="subscriptionCard">
+        <div class="sub-header">
+          <div class="sub-info">
+            <h3 id="subPlanName">FREE Plan</h3>
+            <p id="subStatus">Upgrade to schedule pickups</p>
+          </div>
+          <div class="sub-badge free" id="subBadge">FREE</div>
+        </div>
+        <div class="sub-details" id="subDetails">
+          <div class="sub-stat">
+            <span class="label">Orders this month</span>
+            <span class="value" id="monthlyOrders">0 / 0</span>
+          </div>
+          <div class="sub-stat">
+            <span class="label">Valid until</span>
+            <span class="value" id="subExpiry">-</span>
+          </div>
+        </div>
+        <button
+          class="upgrade-btn"
+          id="upgradeBtn"
+          onclick="showSubscriptionModal()"
+        >
+          <i class="fas fa-crown"></i> Upgrade Plan
+        </button>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card eco">
+          <div class="icon"><i class="fas fa-coins"></i></div>
+          <h3 id="ecoCredits">0</h3>
+          <p>Eco Credits</p>
+        </div>
+        <div class="stat-card points">
+          <div class="icon"><i class="fas fa-star"></i></div>
+          <h3 id="totalPoints">0</h3>
+          <p>Total Points</p>
+        </div>
+        <div class="stat-card co2">
+          <div class="icon"><i class="fas fa-cloud"></i></div>
+          <h3 id="co2Saved">0 kg</h3>
+          <p>CO₂ Saved</p>
+        </div>
+        <div class="stat-card recycled">
+          <div class="icon"><i class="fas fa-recycle"></i></div>
+          <h3 id="recycledKg">0 kg</h3>
+          <p>Recycled</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <h3 class="section-title"><i class="fas fa-bolt"></i> Quick Actions</h3>
+      <div class="quick-actions">
+        <a href="scan.html" class="action-btn scan">
+          <i class="fas fa-qrcode"></i>
+          <span>Scan Waste</span>
+        </a>
+        <a href="recycling.html" class="action-btn recycle">
+          <i class="fas fa-recycle"></i>
+          <span>Log Recycling</span>
+        </a>
+        <a href="order.html" class="action-btn schedule">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Schedule Pickup</span>
+        </a>
+        <a href="incidents.html" class="action-btn safety">
+          <i class="fas fa-shield-alt"></i>
+          <span>Road Safety</span>
+        </a>
+        <a href="facilities.html" class="action-btn facilities">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Find Centers</span>
+        </a>
+        <a href="rewards.html" class="action-btn rewards">
+          <i class="fas fa-gift"></i>
+          <span>Rewards</span>
+        </a>
+      </div>
+
+      <!-- Nearby Incidents Alert -->
+      <div
+        class="incident-alert"
+        id="incidentAlert"
+        style="display: none"
+        onclick="window.location.href = 'incidents.html'"
+      >
+        <div class="alert-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="alert-content">
+          <h4 id="alertTitle">Road Alert Nearby</h4>
+          <p id="alertDescription">No incidents</p>
+        </div>
+        <i
+          class="fas fa-chevron-right"
+          style="color: rgba(255, 255, 255, 0.5)"
+        ></i>
+      </div>
+
+      <!-- My Orders Section -->
+      <h3 class="section-title"><i class="fas fa-truck"></i> My Pickups</h3>
+      <div class="orders-section" id="ordersSection">
+        <div class="order-tabs">
+          <button class="order-tab active" data-status="all" onclick="filterOrders('all')">All</button>
+          <button class="order-tab" data-status="pending" onclick="filterOrders('pending')">Pending</button>
+          <button class="order-tab" data-status="assigned" onclick="filterOrders('assigned')">In Progress</button>
+          <button class="order-tab" data-status="completed" onclick="filterOrders('completed')">Completed</button>
+        </div>
+        <div class="orders-list" id="ordersList">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <h3 class="section-title">
+        <i class="fas fa-history"></i> Recent Activity
+      </h3>
+      <div class="activity-list" id="activityList">
+        <div class="loading">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Your Profile</h2>
+          <button class="close-btn" id="closeModal">&times;</button>
+        </div>
+        <form id="profileForm">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="profileName" placeholder="Enter your name" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              id="profileEmail"
+              placeholder="Enter your email"
+            />
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" id="profileCity" placeholder="Enter your city" />
+          </div>
+          <div class="form-group">
+            <label>Area</label>
+            <input type="text" id="profileArea" placeholder="Enter your area" />
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <input
+              type="text"
+              id="profileAddress"
+              placeholder="Enter your address"
+            />
+          </div>
+          <div class="form-group">
+            <label>Pincode</label>
+            <input
+              type="text"
+              id="profilePincode"
+              placeholder="Enter pincode"
+            />
+          </div>
+          <button type="submit" class="save-btn">Save Changes</button>
+          <button type="button" class="save-btn logout-btn" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- SOS Button -->
+    <button class="sos-button" onclick="showSOSModal()">SOS</button>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a class="nav-item active" href="dashboard.html">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-item" href="scan.html">
+        <i class="fas fa-camera"></i>
+        <span>Scan</span>
+      </a>
+      <a class="nav-item" href="recycling.html">
+        <i class="fas fa-recycle"></i>
+        <span>Recycle</span>
+      </a>
+      <a class="nav-item" href="incidents.html">
+        <i class="fas fa-shield-alt"></i>
+        <span>Safety</span>
+      </a>
+      <a class="nav-item" href="order.html">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Orders</span>
+      </a>
+    </nav>
+
+    <!-- SOS Modal -->
+    <div class="sos-modal" id="sosModal">
+      <div class="sos-modal-content">
+        <div class="sos-modal-icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3>Emergency SOS</h3>
+        <p>
+          This will alert emergency services and share your location. Are you
+          sure?
+        </p>
+        <div class="sos-buttons">
+          <button class="sos-btn cancel" onclick="closeSOSModal()">
+            Cancel
+          </button>
+          <button class="sos-btn confirm" onclick="sendSOS()">Send SOS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div class="modal subscription-modal" id="subscriptionModal">
+      <div class="modal-content subscription-content">
+        <div class="modal-header">
+          <h2>
+            <i class="fas fa-crown" style="color: #fbbf24"></i> Choose Your Plan
+          </h2>
+          <button class="close-btn" onclick="closeSubscriptionModal()">
+            &times;
+          </button>
+        </div>
+        <div class="plans-grid" id="plansGrid">
+          <div class="loading"><div class="spinner"></div></div>
+        </div>
+        <p class="payment-note">
+          <i class="fas fa-lock"></i> Secure payment powered by Stripe
+        </p>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const API_BASE = "/api";
+      let userData = null;
+      let token = localStorage.getItem("token");
+      let userLocation = null;
+
+      // Check auth on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        if (!token) {
+          window.location.href = "/";
+          return;
+        }
+        loadProfile();
+        loadStats();
+        loadActivity();
+        loadLocation();
+        loadSubscription();
+        loadOrders();
+        getUserLocation();
+
+        // Check for payment success/cancel from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("payment") === "success") {
+          const sessionId = urlParams.get("session_id");
+          if (sessionId) {
+            verifyStripePayment(sessionId);
+          }
+          // Clean URL
+          window.history.replaceState({}, document.title, "/dashboard.html");
+        } else if (urlParams.get("payment") === "cancelled") {
+          showToast("Payment was cancelled", "error");
+          window.history.replaceState({}, document.title, "/dashboard.html");
+        } else if (urlParams.get("showSubscription") === "true") {
+          setTimeout(() => showSubscriptionModal(), 500);
+          window.history.replaceState({}, document.title, "/dashboard.html");
+        }
+      });
+
+      // Get user's GPS location
+      function getUserLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              checkNearbyIncidents();
+            },
+            (error) => {
+              console.log("Location access denied");
+            },
+          );
+        }
+      }
+
+      // Check for nearby incidents
+      async function checkNearbyIncidents() {
+        if (!userLocation) return;
+
+        try {
+          const response = await fetch(
+            `${API_BASE}/incidents/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=5`,
+          );
+          const data = await response.json();
+
+          if (data.success && data.incidents && data.incidents.length > 0) {
+            const activeIncidents = data.incidents.filter(
+              (i) => i.status === "active",
+            );
+            if (activeIncidents.length > 0) {
+              document.getElementById("incidentAlert").style.display = "flex";
+              document.getElementById("alertTitle").textContent =
+                `${activeIncidents.length} Road Alert${activeIncidents.length > 1 ? "s" : ""} Nearby`;
+              document.getElementById("alertDescription").textContent =
+                activeIncidents[0].type.replace("_", " ") +
+                " - " +
+                (activeIncidents[0].distance?.toFixed(1) || "?") +
+                " km away";
+            }
+          }
+        } catch (error) {
+          console.error("Error checking incidents:", error);
+        }
+      }
+
+      // SOS Modal functions
+      function showSOSModal() {
+        document.getElementById("sosModal").classList.add("active");
+      }
+
+      function closeSOSModal() {
+        document.getElementById("sosModal").classList.remove("active");
+      }
+
+      async function sendSOS() {
+        closeSOSModal();
+
+        if (!userLocation) {
+          showToast("Getting your location...", "info");
+          try {
+            const position = await new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 10000,
+              });
+            });
+            userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+          } catch (error) {
+            showToast("Cannot get location. Please enable GPS.", "error");
+            return;
+          }
+        }
+
+        try {
+          const response = await fetch(`${API_BASE}/incidents/emergency-sos`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              location: {
+                lat: userLocation.lat,
+                lng: userLocation.lng,
+              },
+            }),
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            showToast("🚨 Emergency SOS sent! Help is on the way.", "success");
+          } else {
+            showToast(
+              "Failed to send SOS. Please call emergency services.",
+              "error",
+            );
+          }
+        } catch (error) {
+          showToast(
+            "Network error. Please call emergency services directly.",
+            "error",
+          );
+        }
+      }
+
+      // Load user location
+      async function loadLocation() {
+        try {
+          const data = await apiFetch("/location/current");
+          if (data && data.success && data.location) {
+            const loc = data.location;
+            let displayAddress = "Set your location →";
+
+            if (loc.city || loc.area) {
+              displayAddress = [loc.area, loc.city].filter(Boolean).join(", ");
+            } else if (loc.coordinates && loc.coordinates.lat) {
+              displayAddress = "Location set ✓";
+            }
+
+            document.getElementById("userLocation").textContent =
+              displayAddress;
+          }
+        } catch (error) {
+          console.error("Error loading location:", error);
+        }
+      }
+
+      // Show toast message
+      function showToast(message, type = "info") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast " + type;
+        toast.style.display = "block";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 3000);
+      }
+
+      // ============================================
+      // ORDERS MANAGEMENT
+      // ============================================
+      let allOrders = [];
+      let currentFilter = 'all';
+
+      async function loadOrders() {
+        try {
+          const data = await apiFetch("/orders/my-orders");
+          if (data && data.success) {
+            allOrders = data.orders || [];
+            renderOrders(allOrders);
+          } else {
+            renderOrders([]);
+          }
+        } catch (error) {
+          console.error("Error loading orders:", error);
+          renderOrders([]);
+        }
+      }
+
+      function filterOrders(status) {
+        currentFilter = status;
+        
+        // Update tab UI
+        document.querySelectorAll('.order-tab').forEach(tab => {
+          tab.classList.remove('active');
+          if (tab.dataset.status === status) {
+            tab.classList.add('active');
+          }
+        });
+
+        // Filter orders
+        let filtered = allOrders;
+        if (status !== 'all') {
+          if (status === 'assigned') {
+            filtered = allOrders.filter(o => ['assigned', 'in_transit', 'arrived'].includes(o.status));
+          } else {
+            filtered = allOrders.filter(o => o.status === status);
+          }
+        }
+        renderOrders(filtered);
+      }
+
+      function renderOrders(orders) {
+        const container = document.getElementById('ordersList');
+        
+        if (!orders || orders.length === 0) {
+          container.innerHTML = `
+            <div class="no-orders">
+              <i class="fas fa-box-open"></i>
+              <p>No orders found</p>
+              <a href="order.html">Schedule your first pickup →</a>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = orders.map(order => `
+          <div class="order-card" onclick="viewOrder('${order._id}')">
+            <div class="order-header">
+              <span class="order-id">${order.orderId || '#' + order._id.slice(-6)}</span>
+              <span class="order-status ${order.status}">${formatStatus(order.status)}</span>
+            </div>
+            <div class="order-details">
+              <span><i class="fas fa-calendar"></i> ${formatDate(order.scheduledDate)}</span>
+              <span><i class="fas fa-clock"></i> ${order.scheduledTime || 'N/A'}</span>
+              <span><i class="fas fa-box"></i> ${order.estimatedQuantity} kg</span>
+            </div>
+            <div class="order-waste-types">
+              ${(order.wasteTypes || []).map(w => `<span class="waste-tag">${w}</span>`).join('')}
+            </div>
+            ${order.assignedWorker ? `
+              <div class="order-worker">
+                <div class="worker-avatar">${(order.assignedWorker.profile?.name || 'W').charAt(0)}</div>
+                <div class="worker-info">
+                  <div class="worker-name">${order.assignedWorker.profile?.name || 'Collector'}</div>
+                  <div class="worker-phone"><i class="fas fa-phone"></i> ${order.assignedWorker.phone || 'N/A'}</div>
+                </div>
+                ${['assigned', 'in_transit', 'arrived'].includes(order.status) ? `
+                  <button class="track-btn" onclick="event.stopPropagation(); trackOrder('${order._id}')">
+                    <i class="fas fa-location-arrow"></i> Track
+                  </button>
+                ` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+      }
+
+      function formatStatus(status) {
+        const statusMap = {
+          'pending': 'Pending',
+          'confirmed': 'Confirmed',
+          'assigned': 'Assigned',
+          'in_transit': 'On the way',
+          'arrived': 'Arrived',
+          'completed': 'Completed',
+          'cancelled': 'Cancelled'
+        };
+        return statusMap[status] || status;
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        const date = new Date(dateStr);
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        if (date.toDateString() === today.toDateString()) return 'Today';
+        if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+        return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      }
+
+      function viewOrder(orderId) {
+        // Show order details (could open a modal)
+        showToast("Order details coming soon!", "info");
+      }
+
+      function trackOrder(orderId) {
+        // Open tracking view
+        window.location.href = `track.html?order=${orderId}`;
+      }
+
+      // API fetch helper
+      async function apiFetch(endpoint, options = {}) {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            ...options.headers,
+          },
+        });
+
+        if (response.status === 401) {
+          localStorage.removeItem("token");
+          window.location.href = "/";
+          return null;
+        }
+
+        return response.json();
+      }
+
+      // Load user profile
+      async function loadProfile() {
+        try {
+          const data = await apiFetch("/user/profile");
+          if (data && data.success) {
+            userData = data.user;
+            updateUI();
+          }
+        } catch (error) {
+          console.error("Error loading profile:", error);
+          showToast("Error loading profile", "error");
+        }
+      }
+
+      // Load user stats
+      async function loadStats() {
+        try {
+          const data = await apiFetch("/user/stats");
+          if (data && data.success) {
+            const stats = data.stats;
+
+            // Update stats display
+            document.getElementById("ecoCredits").textContent =
+              stats.ecoCredits || 0;
+            document.getElementById("totalPoints").textContent =
+              stats.points || 0;
+            document.getElementById("co2Saved").textContent =
+              `${stats.co2Saved || 0} kg`;
+            document.getElementById("recycledKg").textContent =
+              `${stats.recycledKg || 0} kg`;
+
+            // Update level progress
+            document.getElementById("userLevel").textContent = stats.level || 1;
+            document.getElementById("levelBadge").textContent =
+              stats.level || 1;
+            document.getElementById("currentPoints").textContent =
+              stats.points || 0;
+            document.getElementById("pointsToNext").textContent =
+              stats.pointsToNextLevel || 100;
+
+            // Calculate progress percentage
+            const levelPoints = (stats.level - 1) * 100;
+            const progressPoints = (stats.points || 0) - levelPoints;
+            const progressPercent = Math.min((progressPoints / 100) * 100, 100);
+            document.getElementById("progressFill").style.width =
+              `${progressPercent}%`;
+          }
+        } catch (error) {
+          console.error("Error loading stats:", error);
+        }
+      }
+
+      // Load recent activity from real data
+      async function loadActivity() {
+        const activityList = document.getElementById("activityList");
+        activityList.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+          const data = await apiFetch("/user/activity?limit=10");
+          
+          if (data && data.success && data.activities && data.activities.length > 0) {
+            activityList.innerHTML = data.activities.map(activity => `
+              <div class="activity-item">
+                <div class="activity-icon ${activity.type}">
+                  <i class="fas fa-${activity.icon}" style="color: ${activity.iconColor}"></i>
+                </div>
+                <div class="activity-details">
+                  <h4>${activity.title}</h4>
+                  <p>${activity.description} • ${activity.timeAgo}</p>
+                </div>
+                ${activity.points > 0 ? `<span class="activity-points">+${activity.points} pts</span>` : ''}
+              </div>
+            `).join('');
+          } else {
+            activityList.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-leaf"></i>
+                <p>No activity yet. Start by scanning some waste!</p>
+                <a href="scan.html" style="color: #4ade80; margin-top: 10px; display: inline-block;">
+                  <i class="fas fa-camera"></i> Start Scanning
+                </a>
+              </div>
+            `;
+          }
+        } catch (error) {
+          console.error("Error loading activity:", error);
+          activityList.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+              <p>Couldn't load activity. Please try again.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Update UI with user data
+      function updateUI() {
+        if (!userData) return;
+
+        const name = userData.profile?.name || "User";
+        document.getElementById("userName").textContent = name;
+        document.getElementById("userAvatar").textContent = name
+          .charAt(0)
+          .toUpperCase();
+
+        // Update profile form
+        document.getElementById("profileName").value =
+          userData.profile?.name || "";
+        document.getElementById("profileEmail").value =
+          userData.profile?.email || "";
+        document.getElementById("profileCity").value =
+          userData.profile?.city || "";
+        document.getElementById("profileArea").value =
+          userData.profile?.area || "";
+        document.getElementById("profileAddress").value =
+          userData.profile?.address?.street || "";
+        document.getElementById("profilePincode").value =
+          userData.profile?.address?.pincode || "";
+      }
+
+      // Profile modal handlers
+      document.getElementById("userInfo").addEventListener("click", () => {
+        document.getElementById("profileModal").classList.add("active");
+      });
+
+      document.getElementById("closeModal").addEventListener("click", () => {
+        document.getElementById("profileModal").classList.remove("active");
+      });
+
+      // Save profile
+      document
+        .getElementById("profileForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const profileData = {
+            name: document.getElementById("profileName").value,
+            email: document.getElementById("profileEmail").value,
+            city: document.getElementById("profileCity").value,
+            area: document.getElementById("profileArea").value,
+            address: {
+              street: document.getElementById("profileAddress").value,
+              pincode: document.getElementById("profilePincode").value,
+            },
+          };
+
+          try {
+            const data = await apiFetch("/user/profile", {
+              method: "PUT",
+              body: JSON.stringify(profileData),
+            });
+
+            if (data && data.success) {
+              showToast("Profile updated successfully!", "success");
+              userData = data.user;
+              updateUI();
+              document
+                .getElementById("profileModal")
+                .classList.remove("active");
+            } else {
+              showToast(data?.message || "Error updating profile", "error");
+            }
+          } catch (error) {
+            console.error("Error saving profile:", error);
+            showToast("Error saving profile", "error");
+          }
+        });
+
+      // Logout
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        window.location.href = "/";
+      });
+
+      // Close modal on outside click
+      document.getElementById("profileModal").addEventListener("click", (e) => {
+        if (e.target.id === "profileModal") {
+          document.getElementById("profileModal").classList.remove("active");
+        }
+      });
+
+      // ============================================
+      // SUBSCRIPTION MANAGEMENT
+      // ============================================
+
+      // Load subscription status
+      async function loadSubscription() {
+        try {
+          const data = await apiFetch("/payment/subscription");
+          if (data && data.success) {
+            updateSubscriptionUI(data.subscription);
+          }
+        } catch (error) {
+          console.error("Error loading subscription:", error);
+        }
+      }
+
+      // Update subscription UI
+      function updateSubscriptionUI(subscription) {
+        const plan = subscription?.plan || "FREE";
+        const status = subscription?.status || "inactive";
+        const orderLimit = subscription?.orderLimit || 0;
+        const endDate = subscription?.endDate;
+
+        document.getElementById("subPlanName").textContent = `${plan} Plan`;
+
+        // Update badge
+        const badge = document.getElementById("subBadge");
+        badge.textContent = plan;
+        badge.className = "sub-badge " + plan.toLowerCase();
+
+        // Update status
+        if (plan === "FREE") {
+          document.getElementById("subStatus").textContent =
+            "Upgrade to schedule pickups";
+          document.getElementById("upgradeBtn").textContent = "👑 Upgrade Plan";
+        } else if (status === "active") {
+          document.getElementById("subStatus").textContent =
+            "Active subscription";
+          document.getElementById("upgradeBtn").textContent = "⬆️ Change Plan";
+        } else {
+          document.getElementById("subStatus").textContent =
+            "Subscription expired";
+          document.getElementById("upgradeBtn").textContent = "🔄 Renew Plan";
+        }
+
+        // Update details
+        document.getElementById("monthlyOrders").textContent =
+          `${subscription?.ordersThisMonth || 0} / ${orderLimit === 999 ? "∞" : orderLimit}`;
+
+        if (endDate && plan !== "FREE") {
+          const expiry = new Date(endDate);
+          document.getElementById("subExpiry").textContent =
+            expiry.toLocaleDateString();
+        } else {
+          document.getElementById("subExpiry").textContent = "-";
+        }
+      }
+
+      // Show subscription modal
+      async function showSubscriptionModal() {
+        document.getElementById("subscriptionModal").classList.add("active");
+        await loadPlans();
+      }
+
+      // Close subscription modal
+      function closeSubscriptionModal() {
+        document.getElementById("subscriptionModal").classList.remove("active");
+      }
+
+      // Load subscription plans
+      async function loadPlans() {
+        try {
+          const response = await fetch(`${API_BASE}/payment/plans`);
+          const data = await response.json();
+
+          if (data.success && data.plans) {
+            renderPlans(data.plans);
+          }
+        } catch (error) {
+          console.error("Error loading plans:", error);
+          document.getElementById("plansGrid").innerHTML =
+            '<p style="text-align:center; color:#ef4444;">Failed to load plans</p>';
+        }
+      }
+
+      // Render plans
+      function renderPlans(plans) {
+        const grid = document.getElementById("plansGrid");
+        grid.innerHTML = plans
+          .map(
+            (plan, index) => `
+                <div class="plan-card ${index === 1 ? "popular" : ""}" data-plan="${plan.id}">
+                    <div class="plan-header">
+                        <span class="plan-name">${plan.name}</span>
+                        <span class="plan-price">₹${plan.priceInRupees}<span>/month</span></span>
+                    </div>
+                    <ul class="plan-features">
+                        ${plan.features.map((f) => `<li><i class="fas fa-check"></i> ${f}</li>`).join("")}
+                    </ul>
+                    <button class="plan-btn" onclick="subscribeToPlan('${plan.id}')">
+                        Choose ${plan.name}
+                    </button>
+                </div>
+            `,
+          )
+          .join("");
+      }
+
+      // Subscribe to plan (Stripe checkout)
+      async function subscribeToPlan(planId) {
+        try {
+          showToast("Preparing payment...", "info");
+
+          const data = await apiFetch("/payment/create-order", {
+            method: "POST",
+            body: JSON.stringify({ plan: planId, paymentMethod: "stripe" }),
+          });
+
+          if (data && data.success) {
+            if (data.provider === "stripe" && data.checkoutUrl) {
+              // Redirect to Stripe Checkout
+              window.location.href = data.checkoutUrl;
+            } else if (data.provider === "razorpay") {
+              // Use Razorpay (fallback)
+              openRazorpayCheckout(data);
+            }
+          } else {
+            showToast(data?.message || "Failed to create order", "error");
+          }
+        } catch (error) {
+          console.error("Error subscribing:", error);
+          showToast("Payment error. Please try again.", "error");
+        }
+      }
+
+      // Verify Stripe payment after redirect
+      async function verifyStripePayment(sessionId) {
+        try {
+          showToast("Verifying payment...", "info");
+
+          const data = await apiFetch("/payment/verify-stripe", {
+            method: "POST",
+            body: JSON.stringify({ session_id: sessionId }),
+          });
+
+          if (data && data.success) {
+            showToast(
+              "🎉 Payment successful! Subscription activated.",
+              "success",
+            );
+            loadSubscription();
+            loadProfile();
+          } else {
+            showToast(data?.message || "Payment verification failed", "error");
+          }
+        } catch (error) {
+          console.error("Error verifying payment:", error);
+        }
+      }
+
+      // Razorpay checkout (fallback)
+      function openRazorpayCheckout(orderData) {
+        if (typeof Razorpay === "undefined") {
+          showToast("Payment system loading... Please try again.", "error");
+          return;
+        }
+
+        const options = {
+          key: orderData.key,
+          amount: orderData.order.amount,
+          currency: orderData.order.currency,
+          name: "EcoSustain",
+          description: `${orderData.plan.name} Subscription`,
+          order_id: orderData.order.id,
+          handler: async function (response) {
+            try {
+              const verifyData = await apiFetch("/payment/verify", {
+                method: "POST",
+                body: JSON.stringify(response),
+              });
+
+              if (verifyData && verifyData.success) {
+                showToast("🎉 Payment successful!", "success");
+                closeSubscriptionModal();
+                loadSubscription();
+                loadProfile();
+              } else {
+                showToast("Payment verification failed", "error");
+              }
+            } catch (error) {
+              showToast("Error verifying payment", "error");
+            }
+          },
+          prefill: {
+            name: userData?.profile?.name || "",
+            email: userData?.profile?.email || "",
+            contact: userData?.phone || "",
+          },
+          theme: { color: "#4ade80" },
+        };
+
+        new Razorpay(options).open();
+      }
+
+      // Close subscription modal on outside click
+      document
+        .getElementById("subscriptionModal")
+        .addEventListener("click", (e) => {
+          if (e.target.id === "subscriptionModal") {
+            closeSubscriptionModal();
+          }
+        });
+    </script>
+  </body>
+</html>

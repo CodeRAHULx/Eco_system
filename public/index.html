@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone OTP Login - EcoSus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .phone-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-code {
+            width: 70px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        input[type="tel"],
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        #recaptcha-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+        }
+
+        .step.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .step.completed {
+            background: #4caf50;
+            color: white;
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .otp-inputs input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+        }
+
+        .resend-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .resend-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .resend-link a:hover {
+            text-decoration: underline;
+        }
+
+        .user-info {
+            text-align: center;
+        }
+
+        .user-info .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: white;
+        }
+
+        .user-info h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .user-info p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .token-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            word-break: break-all;
+            font-size: 12px;
+            color: #666;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Phone Login</h1>
+        <p class="subtitle">Secure OTP verification with Firebase</p>
+
+        <div class="step-indicator">
+            <div class="step active" id="step1">1</div>
+            <div class="step" id="step2">2</div>
+            <div class="step" id="step3">✓</div>
+        </div>
+
+        <div id="message" class="message hidden"></div>
+
+        <!-- Step 1: Phone Number -->
+        <div id="phone-section">
+            <div class="form-group">
+                <label>Enter your phone number</label>
+                <div class="phone-input">
+                    <input type="text" class="country-code" value="+91" readonly>
+                    <input type="tel" id="phoneNumber" placeholder="9876543210" maxlength="10">
+                </div>
+            </div>
+            <div id="recaptcha-container"></div>
+            <button id="sendOtpBtn" onclick="sendOTP()">Send OTP</button>
+        </div>
+
+        <!-- Step 2: OTP Verification -->
+        <div id="otp-section" class="hidden">
+            <div class="form-group">
+                <label style="text-align: center;">Enter the 6-digit OTP sent to your phone</label>
+                <div class="otp-inputs">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="0">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="1">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="2">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="3">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="4">
+                    <input type="text" maxlength="1" class="otp-digit" data-index="5">
+                </div>
+            </div>
+            <button id="verifyOtpBtn" onclick="verifyOTP()">Verify OTP</button>
+            <div class="resend-link">
+                <a href="#" onclick="resendOTP(); return false;">Didn't receive? Resend OTP</a>
+            </div>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div id="success-section" class="hidden">
+            <div class="user-info">
+                <div class="avatar">✓</div>
+                <h2>Welcome!</h2>
+                <p id="verified-phone"></p>
+                <p style="color: #4caf50; font-weight: 600;">Phone verified successfully</p>
+                <div class="token-box">
+                    <strong>Your JWT Token:</strong><br>
+                    <span id="jwt-token"></span>
+                </div>
+                <button onclick="logout()" style="margin-top: 20px; background: #f44336;">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAtoRj-zCO4iQWHcQSMKqXlO_5Ar8v_DSk",
+            authDomain: "ecosus-6eb45.firebaseapp.com",
+            projectId: "ecosus-6eb45",
+            storageBucket: "ecosus-6eb45.firebasestorage.app",
+            messagingSenderId: "532162786329",
+            appId: "1:532162786329:web:3510ab4973df291633a688",
+            measurementId: "G-WPZWXQC0ND"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        
+        let confirmationResult = null;
+        let recaptchaVerifier = null;
+
+        // Backend API URL
+        const API_URL = 'http://localhost:5000/api/auth';
+
+        // Initialize reCAPTCHA
+        function initRecaptcha() {
+            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'normal',
+                'callback': (response) => {
+                    document.getElementById('sendOtpBtn').disabled = false;
+                },
+                'expired-callback': () => {
+                    showMessage('reCAPTCHA expired. Please try again.', 'error');
+                    document.getElementById('sendOtpBtn').disabled = true;
+                }
+            });
+            recaptchaVerifier.render();
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const msgEl = document.getElementById('message');
+            msgEl.textContent = text;
+            msgEl.className = `message ${type}`;
+            msgEl.classList.remove('hidden');
+        }
+
+        // Hide message
+        function hideMessage() {
+            document.getElementById('message').classList.add('hidden');
+        }
+
+        // Update step indicators
+        function setStep(step) {
+            document.getElementById('step1').className = step >= 1 ? (step > 1 ? 'step completed' : 'step active') : 'step';
+            document.getElementById('step2').className = step >= 2 ? (step > 2 ? 'step completed' : 'step active') : 'step';
+            document.getElementById('step3').className = step >= 3 ? 'step active completed' : 'step';
+        }
+
+        // Send OTP
+        async function sendOTP() {
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            
+            if (!/^[6-9]\d{9}$/.test(phoneNumber)) {
+                showMessage('Please enter a valid 10-digit Indian phone number', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('sendOtpBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Sending...';
+
+            try {
+                const fullPhoneNumber = '+91' + phoneNumber;
+                confirmationResult = await auth.signInWithPhoneNumber(fullPhoneNumber, recaptchaVerifier);
+                
+                showMessage('OTP sent successfully! Check your phone.', 'success');
+                
+                // Show OTP section
+                document.getElementById('phone-section').classList.add('hidden');
+                document.getElementById('otp-section').classList.remove('hidden');
+                setStep(2);
+                
+                // Focus first OTP input
+                document.querySelector('.otp-digit').focus();
+                
+            } catch (error) {
+                console.error('Error sending OTP:', error);
+                showMessage(error.message || 'Failed to send OTP. Please try again.', 'error');
+                
+                // Reset reCAPTCHA
+                recaptchaVerifier.render().then(function(widgetId) {
+                    grecaptcha.reset(widgetId);
+                });
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = 'Send OTP';
+        }
+
+        // Verify OTP
+        async function verifyOTP() {
+            const otpInputs = document.querySelectorAll('.otp-digit');
+            let otp = '';
+            otpInputs.forEach(input => otp += input.value);
+
+            if (otp.length !== 6) {
+                showMessage('Please enter the complete 6-digit OTP', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('verifyOtpBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span>Verifying...';
+
+            try {
+                // Verify OTP with Firebase
+                const result = await confirmationResult.confirm(otp);
+                const user = result.user;
+                
+                // Get Firebase ID token
+                const idToken = await user.getIdToken();
+                
+                showMessage('OTP verified! Authenticating with server...', 'info');
+                
+                // Send to backend
+                const response = await fetch(`${API_URL}/firebase-auth`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ idToken })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Success!
+                    document.getElementById('otp-section').classList.add('hidden');
+                    document.getElementById('success-section').classList.remove('hidden');
+                    document.getElementById('verified-phone').textContent = user.phoneNumber;
+                    document.getElementById('jwt-token').textContent = data.token;
+                    setStep(3);
+                    hideMessage();
+                    
+                    // Store token (use 'token' key to match dashboard.html)
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('authToken', data.token);
+                    
+                    // Redirect to dashboard after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 2000);
+                } else {
+                    showMessage(data.message || 'Server authentication failed', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error verifying OTP:', error);
+                showMessage(error.message || 'Invalid OTP. Please try again.', 'error');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = 'Verify OTP';
+        }
+
+        // Resend OTP
+        async function resendOTP() {
+            // Reset to phone section
+            document.getElementById('otp-section').classList.add('hidden');
+            document.getElementById('phone-section').classList.remove('hidden');
+            document.getElementById('recaptcha-container').innerHTML = '';
+            setStep(1);
+            initRecaptcha();
+            showMessage('Please complete reCAPTCHA and click Send OTP again', 'info');
+        }
+
+        // Logout
+        function logout() {
+            auth.signOut();
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('token');
+            
+            document.getElementById('success-section').classList.add('hidden');
+            document.getElementById('phone-section').classList.remove('hidden');
+            document.getElementById('phoneNumber').value = '';
+            document.getElementById('recaptcha-container').innerHTML = '';
+            
+            setStep(1);
+            initRecaptcha();
+            showMessage('Logged out successfully', 'success');
+        }
+
+        // OTP input handling
+        document.querySelectorAll('.otp-digit').forEach((input, index, inputs) => {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                if (value && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+            
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const paste = e.clipboardData.getData('text').slice(0, 6);
+                paste.split('').forEach((char, i) => {
+                    if (inputs[i]) inputs[i].value = char;
+                });
+            });
+        });
+
+        // Initialize on page load
+        window.onload = function() {
+            initRecaptcha();
+            document.getElementById('sendOtpBtn').disabled = true;
+        };
+    </script>
+</body>
+</html>

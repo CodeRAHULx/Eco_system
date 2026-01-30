@@ -1,0 +1,48 @@
+# ==============================================================================
+# SafeRoute AI v2.0 - REAL APIs Edition
+# ==============================================================================
+
+# Core FastAPI
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.4.2
+python-multipart==0.0.6
+
+# ==============================================================================
+# REAL API INTEGRATIONS - Google, Groq, India Authorities
+# ==============================================================================
+
+# Google Cloud APIs
+google-cloud-vision==3.4.2          # Real Image Analysis - Google Lens
+googlemaps==4.10.0                  # Real Location Services
+
+# AI/LLM APIs
+groq==0.4.1                         # Free LLM - Mixtral 8x7B (Real AI)
+openai==1.3.0                       # Alternative: OpenAI API
+
+# HTTP Clients
+httpx==0.25.0                       # Async HTTP for India Authority APIs
+requests==2.31.0                    # Sync HTTP requests
+aiohttp==3.9.1                      # Alternative async client
+
+# Image Processing & EXIF
+pillow==10.1.0                      # Image analysis, EXIF metadata
+python-magic==0.4.27                # File type detection
+
+# Utilities
+python-dotenv==1.0.0                # Environment variable management
+numpy==1.24.3                       # Numerical operations
+pydantic-settings==2.1.0            # Config management
+python-dateutil==2.8.2              # Date/time utilities
+
+# Logging & Monitoring
+logging-json==1.1                   # Structured JSON logging
+python-json-logger==2.0.7           # JSON formatter for logs
+
+# Optional: Advanced ML (if needed in future)
+# scikit-learn==1.3.1               # ML models
+# tensorflow==2.14.0                # Deep learning
+
+# Optional: Database
+# motor==3.3.2                      # Async MongoDB
+# redis==5.0.0                      # Redis client

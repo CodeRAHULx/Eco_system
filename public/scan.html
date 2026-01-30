@@ -1,0 +1,1366 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Waste Scanner - EcoSustain</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        color: #fff;
+      }
+
+      .header {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .header h1 {
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .header h1 i {
+        color: #4ade80;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .container {
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+      }
+
+      /* Scanner Container */
+      .scanner-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .camera-view {
+        position: relative;
+        width: 100%;
+        height: 350px;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #videoElement {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      #capturedImage {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: none;
+      }
+
+      .camera-placeholder {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .camera-placeholder i {
+        font-size: 60px;
+        margin-bottom: 15px;
+      }
+
+      .scan-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+      }
+
+      .scan-corners {
+        position: absolute;
+        width: 80%;
+        height: 80%;
+        top: 10%;
+        left: 10%;
+        border: 3px solid rgba(74, 222, 128, 0.5);
+        border-radius: 20px;
+      }
+
+      .scan-line {
+        position: absolute;
+        width: 80%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #4ade80, transparent);
+        left: 10%;
+        top: 10%;
+        animation: scanMove 2s ease-in-out infinite;
+        display: none;
+      }
+
+      .scan-line.active {
+        display: block;
+      }
+
+      @keyframes scanMove {
+        0%,
+        100% {
+          top: 10%;
+        }
+        50% {
+          top: 85%;
+        }
+      }
+
+      /* Camera Controls */
+      .camera-controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .control-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        transition: all 0.3s;
+      }
+
+      .control-btn.capture {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #4ade80, #22d3ee);
+        color: #1a1a2e;
+      }
+
+      .control-btn.secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      .control-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .control-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Upload Options */
+      .upload-options {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .upload-option {
+        flex: 1;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .upload-option:hover {
+        border-color: #4ade80;
+        background: rgba(74, 222, 128, 0.1);
+      }
+
+      .upload-option i {
+        font-size: 28px;
+        margin-bottom: 8px;
+        color: #4ade80;
+      }
+
+      .upload-option span {
+        display: block;
+        font-size: 0.85rem;
+      }
+
+      #fileInput {
+        display: none;
+      }
+
+      /* Analysis Results */
+      .results-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: none;
+      }
+
+      .results-section.active {
+        display: block;
+      }
+
+      .results-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .results-header i {
+        color: #4ade80;
+        font-size: 24px;
+      }
+
+      .results-header h3 {
+        font-size: 1.1rem;
+      }
+
+      /* Detected Items */
+      .detected-items {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .detected-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        border-left: 4px solid #4ade80;
+      }
+
+      .item-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+      }
+
+      .item-icon.recyclable {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+      .item-icon.non-recyclable {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+      .item-icon.organic {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+      .item-icon.hazardous {
+        background: rgba(139, 92, 246, 0.2);
+        color: #8b5cf6;
+      }
+
+      .item-details {
+        flex: 1;
+      }
+
+      .item-name {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 4px;
+      }
+
+      .item-category {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .item-weight {
+        text-align: right;
+      }
+
+      .item-weight .value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #22d3ee;
+      }
+
+      .item-weight .unit {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Summary Card */
+      .summary-card {
+        background: linear-gradient(
+          135deg,
+          rgba(74, 222, 128, 0.1),
+          rgba(34, 211, 238, 0.1)
+        );
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 20px;
+        border: 1px solid rgba(74, 222, 128, 0.3);
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .summary-row:last-child {
+        border-bottom: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+
+      .summary-row .label {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .summary-row .value {
+        color: #4ade80;
+      }
+
+      /* Segregation Guide */
+      .segregation-guide {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .guide-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .guide-title i {
+        color: #fbbf24;
+      }
+
+      .bin-categories {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .bin-category {
+        padding: 12px;
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      .bin-category.green {
+        background: rgba(34, 197, 94, 0.2);
+        border: 1px solid #22c55e;
+      }
+      .bin-category.blue {
+        background: rgba(59, 130, 246, 0.2);
+        border: 1px solid #3b82f6;
+      }
+      .bin-category.yellow {
+        background: rgba(234, 179, 8, 0.2);
+        border: 1px solid #eab308;
+      }
+      .bin-category.red {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid #ef4444;
+      }
+
+      .bin-category i {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .bin-category .name {
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .bin-category .count {
+        font-size: 0.75rem;
+        opacity: 0.7;
+      }
+
+      /* Action Button */
+      .action-btn {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        border: none;
+        border-radius: 12px;
+        color: #1a1a2e;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Loading */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 1000;
+      }
+
+      .loading-overlay.active {
+        display: flex;
+      }
+
+      .ai-loader {
+        width: 80px;
+        height: 80px;
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      .ai-loader::before {
+        content: "";
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        border: 4px solid transparent;
+        border-top-color: #4ade80;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .ai-loader i {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 30px;
+        color: #4ade80;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        display: none;
+        z-index: 1001;
+      }
+
+      .toast.success {
+        background: rgba(74, 222, 128, 0.9);
+        color: #fff;
+      }
+      .toast.error {
+        background: rgba(239, 68, 68, 0.9);
+        color: #fff;
+      }
+
+      /* Subscription Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 20px;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+      }
+
+      .subscription-modal {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .subscription-modal .modal-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(251, 191, 36, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 40px;
+        color: #fbbf24;
+      }
+
+      .subscription-modal h2 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+      }
+
+      .subscription-modal p {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 25px;
+        line-height: 1.6;
+      }
+
+      .plan-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .plan-option {
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .plan-option:hover {
+        border-color: #4ade80;
+      }
+
+      .plan-option.popular {
+        border-color: #fbbf24;
+        background: rgba(251, 191, 36, 0.1);
+      }
+
+      .plan-name {
+        font-weight: 600;
+      }
+
+      .plan-price {
+        color: #4ade80;
+        font-weight: 600;
+      }
+
+      .modal-btn {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      .modal-btn.primary {
+        background: linear-gradient(90deg, #4ade80, #22d3ee);
+        color: #1a1a2e;
+      }
+
+      .modal-btn.secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      /* Tips Section */
+      .tips-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .tips-section h3 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        font-size: 1rem;
+      }
+
+      .tips-section h3 i {
+        color: #22d3ee;
+      }
+
+      .tips-list {
+        list-style: none;
+      }
+
+      .tips-list li {
+        padding: 8px 0;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .tips-list li i {
+        color: #4ade80;
+        margin-top: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <button class="back-btn" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1><i class="fas fa-robot"></i> AI Scanner</h1>
+      <div style="width: 30px"></div>
+    </header>
+
+    <div class="container">
+      <!-- Scanner -->
+      <div class="scanner-container">
+        <div class="camera-view">
+          <video id="videoElement" autoplay playsinline></video>
+          <img id="capturedImage" alt="Captured" />
+          <div class="camera-placeholder" id="placeholder">
+            <i class="fas fa-camera"></i>
+            <p>Camera preview will appear here</p>
+          </div>
+          <div class="scan-overlay">
+            <div class="scan-corners"></div>
+            <div class="scan-line" id="scanLine"></div>
+          </div>
+        </div>
+        <div class="camera-controls">
+          <button
+            class="control-btn secondary"
+            id="switchCameraBtn"
+            onclick="switchCamera()"
+          >
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <button
+            class="control-btn capture"
+            id="captureBtn"
+            onclick="captureImage()"
+          >
+            <i class="fas fa-camera"></i>
+          </button>
+          <button
+            class="control-btn secondary"
+            id="flashBtn"
+            onclick="toggleFlash()"
+          >
+            <i class="fas fa-bolt"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Options -->
+      <div class="upload-options">
+        <label class="upload-option" for="fileInput">
+          <i class="fas fa-images"></i>
+          <span>Upload from Gallery</span>
+        </label>
+        <input
+          type="file"
+          id="fileInput"
+          accept="image/*"
+          onchange="handleFileUpload(event)"
+        />
+        <div class="upload-option" onclick="startCamera()">
+          <i class="fas fa-video"></i>
+          <span>Start Camera</span>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="tips-section" id="tipsSection">
+        <h3><i class="fas fa-lightbulb"></i> Tips for Better Detection</h3>
+        <ul class="tips-list">
+          <li>
+            <i class="fas fa-check"></i> Ensure good lighting on the items
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Place items on a plain background
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Capture one category at a time for
+            accuracy
+          </li>
+          <li>
+            <i class="fas fa-check"></i> Keep camera steady while capturing
+          </li>
+        </ul>
+      </div>
+
+      <!-- Results Section (hidden by default) -->
+      <div class="results-section" id="resultsSection">
+        <div class="results-header">
+          <i class="fas fa-check-circle"></i>
+          <h3>Detection Results</h3>
+        </div>
+
+        <div class="detected-items" id="detectedItems">
+          <!-- Filled by JS -->
+        </div>
+
+        <!-- Segregation Guide -->
+        <div class="segregation-guide" style="margin-top: 20px">
+          <div class="guide-title">
+            <i class="fas fa-recycle"></i>
+            <h4>Segregation Guide</h4>
+          </div>
+          <div class="bin-categories" id="binCategories">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-card">
+          <div class="summary-row">
+            <span class="label">Total Items Detected</span>
+            <span class="value" id="totalItems">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Estimated Weight</span>
+            <span class="value" id="totalWeight">0 kg</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Recyclable Items</span>
+            <span class="value" id="recyclableCount">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="label">Estimated Value</span>
+            <span class="value" id="estimatedValue">₹0</span>
+          </div>
+        </div>
+
+        <button class="action-btn" onclick="proceedToOrder()">
+          <i class="fas fa-truck"></i> Schedule Pickup
+        </button>
+        <button
+          class="action-btn"
+          style="
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin-top: 10px;
+          "
+          onclick="scanAgain()"
+        >
+          <i class="fas fa-redo"></i> Scan Again
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="ai-loader">
+        <i class="fas fa-brain"></i>
+      </div>
+      <p class="loading-text" id="loadingText">AI is analyzing your image...</p>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div class="modal-overlay" id="subscriptionModal">
+      <div class="subscription-modal">
+        <div class="modal-icon">
+          <i class="fas fa-crown"></i>
+        </div>
+        <h2>Upgrade to Premium</h2>
+        <p>
+          AI Waste Scanner is a premium feature. Upgrade your plan to unlock
+          unlimited scans and more!
+        </p>
+        <div class="plan-options">
+          <div class="plan-option" onclick="selectPlan('basic')">
+            <span class="plan-name">Basic - 10 scans/month</span>
+            <span class="plan-price">₹49/mo</span>
+          </div>
+          <div class="plan-option popular" onclick="selectPlan('premium')">
+            <span class="plan-name">Premium - Unlimited</span>
+            <span class="plan-price">₹99/mo</span>
+          </div>
+        </div>
+        <button class="modal-btn primary" onclick="subscribePlan()">
+          <i class="fas fa-rocket"></i> Upgrade Now
+        </button>
+        <button class="modal-btn secondary" onclick="closeSubscriptionModal()">
+          Maybe Later
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const API_BASE = "/api";
+      let token =
+        localStorage.getItem("token") || localStorage.getItem("authToken");
+      let videoStream = null;
+      let currentCamera = "environment"; // 'user' or 'environment'
+      let userSubscription = null;
+      let scanResults = null;
+      let isLoggedIn = false;
+
+      // Check auth on load - BUT ALLOW SCANNING WITHOUT LOGIN
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Scanning works without login - check if logged in for extra features
+        if (token) {
+          isLoggedIn = true;
+          await checkSubscription();
+        } else {
+          // Show info that login is optional for scanning
+          console.log(
+            "Not logged in - scanning available, but order scheduling requires login",
+          );
+        }
+      });
+
+      // Check subscription status (only if logged in)
+      async function checkSubscription() {
+        try {
+          const response = await fetch(`${API_BASE}/payment/subscription`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("authToken");
+            isLoggedIn = false;
+            token = null;
+            // Don't redirect - allow scanning without login
+            return;
+          }
+
+          const data = await response.json();
+
+          if (data.success) {
+            userSubscription = data.subscription;
+
+            // Check if subscription allows AI scan - must have valid plan AND active status
+            const allowedPlans = ["BASIC", "PREMIUM", "ENTERPRISE"];
+            const hasValidPlan = allowedPlans.includes(userSubscription?.plan);
+            const isActive = userSubscription?.status === "active";
+            
+            // Only show modal if user doesn't have a valid active subscription
+            if (!hasValidPlan || !isActive) {
+              document
+                .getElementById("subscriptionModal")
+                .classList.add("active");
+            }
+          }
+        } catch (error) {
+          console.error("Subscription check error:", error);
+        }
+      }
+
+      // Close subscription modal
+      function closeSubscriptionModal() {
+        document.getElementById("subscriptionModal").classList.remove("active");
+        window.location.href = "/dashboard.html";
+      }
+
+      // Select plan
+      function selectPlan(plan) {
+        document
+          .querySelectorAll(".plan-option")
+          .forEach((el) => el.classList.remove("popular"));
+        event.target.closest(".plan-option").classList.add("popular");
+      }
+
+      // Subscribe to plan
+      async function subscribePlan() {
+        showToast("Redirecting to payment...", "success");
+        // TODO: Integrate payment gateway
+        setTimeout(() => {
+          window.location.href = "/subscription.html";
+        }, 1000);
+      }
+
+      // Start camera
+      async function startCamera() {
+        try {
+          document.getElementById("placeholder").style.display = "none";
+          document.getElementById("capturedImage").style.display = "none";
+          document.getElementById("videoElement").style.display = "block";
+
+          const constraints = {
+            video: {
+              facingMode: currentCamera,
+              width: { ideal: 1920 },
+              height: { ideal: 1080 },
+            },
+          };
+
+          if (videoStream) {
+            videoStream.getTracks().forEach((track) => track.stop());
+          }
+
+          videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+          document.getElementById("videoElement").srcObject = videoStream;
+        } catch (error) {
+          console.error("Camera error:", error);
+          showToast(
+            "Unable to access camera. Please check permissions.",
+            "error",
+          );
+        }
+      }
+
+      // Switch camera (front/back)
+      async function switchCamera() {
+        currentCamera =
+          currentCamera === "environment" ? "user" : "environment";
+        await startCamera();
+      }
+
+      // Toggle flash
+      function toggleFlash() {
+        if (videoStream) {
+          const track = videoStream.getVideoTracks()[0];
+          const capabilities = track.getCapabilities();
+
+          if (capabilities.torch) {
+            const constraints = track.getConstraints();
+            constraints.advanced = [
+              { torch: !constraints.advanced?.[0]?.torch },
+            ];
+            track.applyConstraints(constraints);
+          } else {
+            showToast("Flash not available on this device", "error");
+          }
+        }
+      }
+
+      // Capture image from camera
+      function captureImage() {
+        const video = document.getElementById("videoElement");
+
+        if (!videoStream) {
+          showToast("Please start the camera first", "error");
+          return;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL("image/jpeg", 0.8);
+
+        // Show captured image
+        document.getElementById("videoElement").style.display = "none";
+        document.getElementById("capturedImage").src = imageData;
+        document.getElementById("capturedImage").style.display = "block";
+
+        // Stop camera
+        if (videoStream) {
+          videoStream.getTracks().forEach((track) => track.stop());
+          videoStream = null;
+        }
+
+        // Analyze image
+        analyzeImage(imageData);
+      }
+
+      // Handle file upload
+      function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const imageData = e.target.result;
+
+          // Show uploaded image
+          document.getElementById("placeholder").style.display = "none";
+          document.getElementById("videoElement").style.display = "none";
+          document.getElementById("capturedImage").src = imageData;
+          document.getElementById("capturedImage").style.display = "block";
+
+          // Analyze image
+          analyzeImage(imageData);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // Analyze image with AI
+      async function analyzeImage(imageData) {
+        document.getElementById("loadingOverlay").classList.add("active");
+        document.getElementById("scanLine").classList.add("active");
+
+        const loadingTexts = [
+          "AI is analyzing your image...",
+          "Detecting objects...",
+          "Classifying waste types...",
+          "Estimating weights...",
+          "Generating segregation guide...",
+        ];
+
+        let textIndex = 0;
+        const textInterval = setInterval(() => {
+          textIndex = (textIndex + 1) % loadingTexts.length;
+          document.getElementById("loadingText").textContent =
+            loadingTexts[textIndex];
+        }, 1500);
+
+        try {
+          const response = await fetch(`${API_BASE}/ai/analyze-waste`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              image: imageData,
+            }),
+          });
+
+          clearInterval(textInterval);
+
+          if (response.status === 401) {
+            localStorage.removeItem("token");
+            window.location.href = "/";
+            return;
+          }
+
+          if (response.status === 403) {
+            document
+              .getElementById("loadingOverlay")
+              .classList.remove("active");
+            document
+              .getElementById("subscriptionModal")
+              .classList.add("active");
+            return;
+          }
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Store scan data with scanId from database
+            scanResults = {
+              ...data.results,
+              scanId: data.scanId, // DB reference - this is the important part
+              aiProvider: data.aiProvider,
+              processingTime: data.processingTime,
+            };
+            displayResults(data.results);
+          } else {
+            throw new Error(data.message || "Analysis failed");
+          }
+        } catch (error) {
+          console.error("Analysis error:", error);
+          clearInterval(textInterval);
+          showToast("Failed to analyze image. Please try again.", "error");
+        } finally {
+          document.getElementById("loadingOverlay").classList.remove("active");
+          document.getElementById("scanLine").classList.remove("active");
+        }
+      }
+
+      // Display results
+      function displayResults(results) {
+        document.getElementById("tipsSection").style.display = "none";
+        document.getElementById("resultsSection").classList.add("active");
+
+        const itemsContainer = document.getElementById("detectedItems");
+
+        // Check if AI is not configured
+        if (results.aiNotConfigured) {
+          itemsContainer.innerHTML = `
+                    <div class="ai-error-message" style="text-align: center; padding: 30px; background: rgba(255, 193, 7, 0.1); border-radius: 12px; border: 1px solid rgba(255, 193, 7, 0.3);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ffc107; margin-bottom: 15px;"></i>
+                        <h4 style="color: #ffc107; margin-bottom: 10px;">AI Not Configured</h4>
+                        <p style="color: #aaa; margin-bottom: 15px;">${results.message}</p>
+                        <div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; font-size: 14px;">
+                            <p style="color: #00ff88; margin-bottom: 10px;"><strong>To enable real AI detection:</strong></p>
+                            <ol style="color: #ddd; margin-left: 20px;">
+                                <li style="margin-bottom: 8px;">Get a FREE API key from: <a href="https://makersuite.google.com/app/apikey" target="_blank" style="color: #00d4ff;">Google AI Studio</a></li>
+                                <li style="margin-bottom: 8px;">Add to .env file: <code style="background: #333; padding: 2px 6px; border-radius: 4px;">GEMINI_API_KEY=your_key</code></li>
+                                <li>Restart the server</li>
+                            </ol>
+                        </div>
+                    </div>
+                `;
+
+          // Hide other sections
+          document.getElementById("binCategories").innerHTML = "";
+          document.getElementById("totalItems").textContent = "0";
+          document.getElementById("totalWeight").textContent = "0 kg";
+          document.getElementById("recyclableCount").textContent = "0";
+          document.getElementById("estimatedValue").textContent = "₹0";
+          return;
+        }
+
+        // Check if rate limited
+        if (results.rateLimited) {
+          itemsContainer.innerHTML = `
+                    <div class="rate-limit-message" style="text-align: center; padding: 30px; background: rgba(255, 152, 0, 0.1); border-radius: 12px; border: 1px solid rgba(255, 152, 0, 0.3);">
+                        <i class="fas fa-clock" style="font-size: 48px; color: #ff9800; margin-bottom: 15px;"></i>
+                        <h4 style="color: #ff9800; margin-bottom: 10px;">Too Many Requests</h4>
+                        <p style="color: #aaa; margin-bottom: 15px;">${results.message}</p>
+                        <p style="color: #ddd;">The free AI has a rate limit. Please wait 30 seconds and try again.</p>
+                        <button onclick="scanAgain()" style="margin-top: 15px; padding: 12px 24px; background: #ff9800; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-redo"></i> Try Again
+                        </button>
+                    </div>
+                `;
+
+          // Hide other sections
+          document.getElementById("binCategories").innerHTML = "";
+          document.getElementById("totalItems").textContent = "0";
+          document.getElementById("totalWeight").textContent = "0 kg";
+          document.getElementById("recyclableCount").textContent = "0";
+          document.getElementById("estimatedValue").textContent = "₹0";
+          return;
+        }
+
+        // Check if it's not waste (e.g., a person, animal, etc.)
+        if (results.isWaste === false) {
+          itemsContainer.innerHTML = `
+                    <div class="not-waste-message" style="text-align: center; padding: 30px; background: rgba(0, 212, 255, 0.1); border-radius: 12px; border: 1px solid rgba(0, 212, 255, 0.3);">
+                        <i class="fas fa-info-circle" style="font-size: 48px; color: #00d4ff; margin-bottom: 15px;"></i>
+                        <h4 style="color: #00d4ff; margin-bottom: 10px;">Not Waste Detected</h4>
+                        <p style="color: #aaa; margin-bottom: 10px;"><strong>Detected:</strong> ${results.detectedContent || "Unknown content"}</p>
+                        <p style="color: #aaa;">${results.message || "Please scan actual waste items like plastic bottles, paper, or other garbage."}</p>
+                    </div>
+                `;
+
+          // Hide other sections
+          document.getElementById("binCategories").innerHTML = "";
+          document.getElementById("totalItems").textContent = "0";
+          document.getElementById("totalWeight").textContent = "0 kg";
+          document.getElementById("recyclableCount").textContent = "0";
+          document.getElementById("estimatedValue").textContent = "₹0";
+          return;
+        }
+
+        // Display detected items (normal waste detection)
+        itemsContainer.innerHTML = results.items
+          .map(
+            (item) => `
+                <div class="detected-item">
+                    <div class="item-icon ${item.recyclable ? "recyclable" : "non-recyclable"}">
+                        <i class="fas ${getItemIcon(item.category)}"></i>
+                    </div>
+                    <div class="item-details">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-category">${item.category} • ${item.recyclable ? "Recyclable" : "Non-Recyclable"}</div>
+                    </div>
+                    <div class="item-weight">
+                        <div class="value">${item.estimatedWeight}</div>
+                        <div class="unit">kg (est.)</div>
+                    </div>
+                </div>
+            `,
+          )
+          .join("");
+
+        // Display bin categories
+        const binContainer = document.getElementById("binCategories");
+        binContainer.innerHTML = `
+                <div class="bin-category green">
+                    <i class="fas fa-leaf"></i>
+                    <div class="name">Wet/Organic</div>
+                    <div class="count">${results.segregation.organic} items</div>
+                </div>
+                <div class="bin-category blue">
+                    <i class="fas fa-recycle"></i>
+                    <div class="name">Dry/Recyclable</div>
+                    <div class="count">${results.segregation.recyclable} items</div>
+                </div>
+                <div class="bin-category yellow">
+                    <i class="fas fa-box"></i>
+                    <div class="name">Paper/Cardboard</div>
+                    <div class="count">${results.segregation.paper} items</div>
+                </div>
+                <div class="bin-category red">
+                    <i class="fas fa-skull-crossbones"></i>
+                    <div class="name">Hazardous</div>
+                    <div class="count">${results.segregation.hazardous} items</div>
+                </div>
+            `;
+
+        // Update summary
+        document.getElementById("totalItems").textContent = results.totalItems;
+        document.getElementById("totalWeight").textContent =
+          results.totalWeight + " kg";
+        document.getElementById("recyclableCount").textContent =
+          results.recyclableCount;
+        document.getElementById("estimatedValue").textContent =
+          "₹" + results.estimatedValue;
+      }
+
+      // Get icon for item category
+      function getItemIcon(category) {
+        const icons = {
+          Plastic: "fa-wine-bottle",
+          Paper: "fa-newspaper",
+          Glass: "fa-glass-martini",
+          Metal: "fa-cog",
+          "E-Waste": "fa-laptop",
+          Organic: "fa-leaf",
+          Hazardous: "fa-skull-crossbones",
+          Textile: "fa-tshirt",
+          default: "fa-trash",
+        };
+        return icons[category] || icons.default;
+      }
+
+      // Scan again
+      function scanAgain() {
+        document.getElementById("resultsSection").classList.remove("active");
+        document.getElementById("tipsSection").style.display = "block";
+        document.getElementById("capturedImage").style.display = "none";
+        document.getElementById("placeholder").style.display = "block";
+        document.getElementById("fileInput").value = "";
+        scanResults = null;
+      }
+
+      // Proceed to order - NOW WITH LOGIN & SUBSCRIPTION CHECK
+      function proceedToOrder() {
+        // Check if logged in
+        if (!isLoggedIn || !token) {
+          showToast("Please login to schedule a pickup", "error");
+          setTimeout(() => {
+            // Store scan results before redirecting
+            if (scanResults) {
+              localStorage.setItem(
+                "pendingScanResults",
+                JSON.stringify(scanResults),
+              );
+            }
+            window.location.href = "/index.html?redirect=order&from=scan";
+          }, 1500);
+          return;
+        }
+
+        // Check subscription for order (Free plan cannot order)
+        const plan = userSubscription?.plan || "FREE";
+        if (plan === "FREE") {
+          document.getElementById("subscriptionModal").classList.add("active");
+          return;
+        }
+
+        // Check if subscription is active
+        if (userSubscription?.status !== "active") {
+          showToast(
+            "Your subscription has expired. Please renew to schedule pickups.",
+            "error",
+          );
+          setTimeout(() => {
+            window.location.href = "/dashboard.html?showSubscription=true";
+          }, 2000);
+          return;
+        }
+
+        // All checks passed - proceed to order
+        if (scanResults) {
+          // Store scan results for order page
+          localStorage.setItem("scanResults", JSON.stringify(scanResults));
+        }
+        window.location.href = "/order.html?from=scan";
+      }
+
+      // Go back
+      function goBack() {
+        if (videoStream) {
+          videoStream.getTracks().forEach((track) => track.stop());
+        }
+        window.history.back();
+      }
+
+      // Show toast
+      function showToast(message, type = "info") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast " + type;
+        toast.style.display = "block";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

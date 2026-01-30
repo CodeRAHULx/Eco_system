@@ -1,0 +1,1174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoSustain - Find Recycling Centers</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        color: #fff;
+        padding-bottom: 80px;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .header h1 {
+        flex: 1;
+        font-size: 1.3rem;
+      }
+
+      /* Container */
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Search Bar */
+      .search-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .search-input {
+        flex: 1;
+        padding: 12px 15px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .search-input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .search-btn {
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        border: none;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      /* Filter Chips */
+      .filter-chips {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        margin-bottom: 20px;
+        padding-bottom: 5px;
+      }
+
+      .filter-chips::-webkit-scrollbar {
+        display: none;
+      }
+
+      .chip {
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.85rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.3s;
+      }
+
+      .chip.active {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        color: #fff;
+        border-color: transparent;
+      }
+
+      .chip i {
+        margin-right: 5px;
+      }
+
+      /* Location Card */
+      .location-card {
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .location-card i {
+        color: #8b5cf6;
+        font-size: 20px;
+      }
+
+      .location-card .location-text {
+        flex: 1;
+      }
+
+      .location-card p {
+        font-size: 0.9rem;
+      }
+
+      .location-card small {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.75rem;
+      }
+
+      .location-card button {
+        background: rgba(139, 92, 246, 0.2);
+        border: none;
+        color: #a78bfa;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.8rem;
+      }
+
+      /* Facility Card */
+      .facility-card {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .facility-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+      }
+
+      .facility-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 12px;
+      }
+
+      .facility-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: white;
+      }
+
+      .facility-info {
+        flex: 1;
+      }
+
+      .facility-info h3 {
+        font-size: 1rem;
+        margin-bottom: 3px;
+      }
+
+      .facility-rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 5px;
+      }
+
+      .facility-rating .stars {
+        color: #fbbf24;
+      }
+
+      .facility-rating span {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .facility-distance {
+        font-size: 0.8rem;
+        color: #a78bfa;
+      }
+
+      .facility-status {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+
+      .facility-status.open {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+
+      .facility-status.closed {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+      }
+
+      /* Materials Tags */
+      .materials-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+
+      .material-tag {
+        padding: 4px 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .material-tag.plastic {
+        background: rgba(96, 165, 250, 0.2);
+        color: #60a5fa;
+      }
+      .material-tag.paper {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+      .material-tag.metal {
+        background: rgba(161, 161, 170, 0.2);
+        color: #a1a1aa;
+      }
+      .material-tag.glass {
+        background: rgba(34, 211, 238, 0.2);
+        color: #22d3ee;
+      }
+      .material-tag.electronics {
+        background: rgba(168, 85, 247, 0.2);
+        color: #a855f7;
+      }
+      .material-tag.organic {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+
+      /* Facility Footer */
+      .facility-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .facility-hours {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .facility-hours i {
+        margin-right: 5px;
+      }
+
+      .facility-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .action-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s;
+      }
+
+      .action-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .action-btn.primary {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+      }
+
+      /* Facility Detail Modal */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        overflow-y: auto;
+      }
+
+      .modal.active {
+        display: block;
+      }
+
+      .modal-content {
+        background: #1a1a2e;
+        margin: 20px auto;
+        width: 95%;
+        max-width: 500px;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .modal-header {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        padding: 20px;
+        position: relative;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.3);
+        border: none;
+        color: #fff;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 18px;
+      }
+
+      .modal-header h2 {
+        font-size: 1.3rem;
+        margin-bottom: 5px;
+      }
+
+      .modal-header p {
+        opacity: 0.9;
+        font-size: 0.9rem;
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .detail-section {
+        margin-bottom: 20px;
+      }
+
+      .detail-section h4 {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .detail-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .detail-row i {
+        width: 25px;
+        color: #a78bfa;
+      }
+
+      .detail-row span {
+        flex: 1;
+      }
+
+      /* Reviews */
+      .review-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 10px;
+      }
+
+      .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .review-author {
+        font-weight: 600;
+      }
+
+      .review-date {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .review-text {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.4;
+      }
+
+      /* Add Review */
+      .add-review {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+      }
+
+      .add-review textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 0.9rem;
+        resize: none;
+        height: 80px;
+        margin-bottom: 10px;
+      }
+
+      .rating-input {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 10px;
+      }
+
+      .rating-input i {
+        font-size: 20px;
+        color: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+
+      .rating-input i.active {
+        color: #fbbf24;
+      }
+
+      .submit-review-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .empty-state i {
+        font-size: 60px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+      }
+
+      /* Loading */
+      .loading {
+        display: flex;
+        justify-content: center;
+        padding: 60px;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #8b5cf6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Bottom Navigation */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        font-size: 0.75rem;
+      }
+
+      .nav-item i {
+        font-size: 20px;
+      }
+
+      .nav-item.active {
+        color: #8b5cf6;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 10px;
+        z-index: 2000;
+        display: none;
+      }
+
+      .toast.success {
+        background: rgba(74, 222, 128, 0.9);
+        color: #000;
+      }
+      .toast.error {
+        background: rgba(239, 68, 68, 0.9);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <button class="back-btn" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1>
+        <i class="fas fa-map-marker-alt" style="color: #8b5cf6"></i> Find
+        Centers
+      </h1>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="Search by name or location..."
+        />
+        <button class="search-btn" onclick="searchFacilities()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+
+      <!-- Location Card -->
+      <div class="location-card">
+        <i class="fas fa-location-crosshairs"></i>
+        <div class="location-text">
+          <p id="locationText">Getting your location...</p>
+          <small id="locationCoords">Enable GPS for nearby results</small>
+        </div>
+        <button onclick="refreshLocation()">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="filter-chips">
+        <div class="chip active" onclick="filterByMaterial('all')">All</div>
+        <div class="chip" onclick="filterByMaterial('plastic')">
+          <i class="fas fa-wine-bottle"></i>Plastic
+        </div>
+        <div class="chip" onclick="filterByMaterial('paper')">
+          <i class="fas fa-newspaper"></i>Paper
+        </div>
+        <div class="chip" onclick="filterByMaterial('metal')">
+          <i class="fas fa-recycle"></i>Metal
+        </div>
+        <div class="chip" onclick="filterByMaterial('electronics')">
+          <i class="fas fa-laptop"></i>E-Waste
+        </div>
+        <div class="chip" onclick="filterByMaterial('glass')">
+          <i class="fas fa-glass-whiskey"></i>Glass
+        </div>
+      </div>
+
+      <!-- Facilities List -->
+      <div id="facilitiesList">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- Facility Detail Modal -->
+    <div class="modal" id="facilityModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button class="modal-close" onclick="closeFacilityModal()">
+            &times;
+          </button>
+          <h2 id="modalFacilityName">Facility Name</h2>
+          <p id="modalFacilityAddress">Address</p>
+        </div>
+        <div class="modal-body">
+          <div class="detail-section">
+            <h4>Details</h4>
+            <div class="detail-row">
+              <i class="fas fa-clock"></i>
+              <span id="modalHours">9:00 AM - 6:00 PM</span>
+            </div>
+            <div class="detail-row">
+              <i class="fas fa-phone"></i>
+              <span id="modalPhone">Not available</span>
+            </div>
+            <div class="detail-row">
+              <i class="fas fa-map-marker-alt"></i>
+              <span id="modalDistance">-- km away</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Accepted Materials</h4>
+            <div class="materials-tags" id="modalMaterials"></div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Reviews</h4>
+            <div id="modalReviews">
+              <p style="color: rgba(255, 255, 255, 0.5)">No reviews yet</p>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h4>Add a Review</h4>
+            <div class="add-review">
+              <div class="rating-input" id="ratingInput">
+                <i class="fas fa-star" data-rating="1"></i>
+                <i class="fas fa-star" data-rating="2"></i>
+                <i class="fas fa-star" data-rating="3"></i>
+                <i class="fas fa-star" data-rating="4"></i>
+                <i class="fas fa-star" data-rating="5"></i>
+              </div>
+              <textarea
+                id="reviewText"
+                placeholder="Write your review..."
+              ></textarea>
+              <button class="submit-review-btn" onclick="submitReview()">
+                Submit Review
+              </button>
+            </div>
+          </div>
+
+          <div class="facility-actions" style="margin-top: 20px">
+            <button
+              class="action-btn primary"
+              style="flex: 1"
+              onclick="openDirections()"
+            >
+              <i class="fas fa-directions"></i> Get Directions
+            </button>
+            <button class="action-btn" onclick="callFacility()">
+              <i class="fas fa-phone"></i> Call
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a class="nav-item" href="dashboard.html">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-item" href="scan.html">
+        <i class="fas fa-camera"></i>
+        <span>Scan</span>
+      </a>
+      <a class="nav-item" href="recycling.html">
+        <i class="fas fa-recycle"></i>
+        <span>Recycle</span>
+      </a>
+      <a class="nav-item" href="incidents.html">
+        <i class="fas fa-shield-alt"></i>
+        <span>Safety</span>
+      </a>
+      <a class="nav-item active" href="facilities.html">
+        <i class="fas fa-map-marker-alt"></i>
+        <span>Centers</span>
+      </a>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const API_BASE = "/api";
+      let token = localStorage.getItem("token");
+      let userLocation = null;
+      let allFacilities = [];
+      let currentFacility = null;
+      let selectedRating = 0;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        getUserLocation();
+        setupRatingInput();
+      });
+
+      // Get user location
+      function getUserLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              document.getElementById("locationText").textContent =
+                "Location acquired ✓";
+              document.getElementById("locationCoords").textContent =
+                `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}`;
+
+              loadFacilities();
+            },
+            (error) => {
+              document.getElementById("locationText").textContent =
+                "Location unavailable";
+              loadFacilities();
+            },
+          );
+        } else {
+          loadFacilities();
+        }
+      }
+
+      function refreshLocation() {
+        document.getElementById("locationText").textContent = "Updating...";
+        getUserLocation();
+      }
+
+      // Load facilities
+      async function loadFacilities() {
+        const container = document.getElementById("facilitiesList");
+        container.innerHTML =
+          '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+          let url = `${API_BASE}/facilities`;
+          if (userLocation) {
+            url = `${API_BASE}/facilities/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=50`;
+          }
+
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (data.success && data.facilities && data.facilities.length > 0) {
+            allFacilities = data.facilities;
+            renderFacilities(allFacilities);
+          } else {
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <p>No recycling centers found nearby.<br>Try expanding your search.</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          console.error("Error loading facilities:", error);
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Error loading facilities.<br>Please try again.</p>
+                    </div>
+                `;
+        }
+      }
+
+      // Render facilities
+      function renderFacilities(facilities) {
+        const container = document.getElementById("facilitiesList");
+
+        if (facilities.length === 0) {
+          container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>No facilities match your filters.</p>
+                    </div>
+                `;
+          return;
+        }
+
+        container.innerHTML = facilities
+          .map((facility) => {
+            const isOpen = checkIfOpen(facility.operatingHours);
+            const distanceText = facility.distance
+              ? `${facility.distance.toFixed(1)} km`
+              : "--";
+            const rating = facility.rating?.average || 0;
+            const reviewCount = facility.rating?.count || 0;
+
+            return `
+                    <div class="facility-card" onclick="openFacilityDetail('${facility._id}')">
+                        <div class="facility-header">
+                            <div class="facility-icon">
+                                <i class="fas fa-recycle"></i>
+                            </div>
+                            <div class="facility-info">
+                                <h3>${facility.name}</h3>
+                                <div class="facility-rating">
+                                    <span class="stars">${"★".repeat(Math.round(rating))}${"☆".repeat(5 - Math.round(rating))}</span>
+                                    <span>${rating.toFixed(1)} (${reviewCount})</span>
+                                </div>
+                                <div class="facility-distance">
+                                    <i class="fas fa-location-arrow"></i> ${distanceText}
+                                </div>
+                            </div>
+                            <span class="facility-status ${isOpen ? "open" : "closed"}">
+                                ${isOpen ? "Open" : "Closed"}
+                            </span>
+                        </div>
+                        <div class="materials-tags">
+                            ${(facility.acceptedMaterials || [])
+                              .slice(0, 5)
+                              .map(
+                                (m) =>
+                                  `<span class="material-tag ${m}">${m}</span>`,
+                              )
+                              .join("")}
+                            ${
+                              (facility.acceptedMaterials || []).length > 5
+                                ? `<span class="material-tag">+${facility.acceptedMaterials.length - 5}</span>`
+                                : ""
+                            }
+                        </div>
+                        <div class="facility-footer">
+                            <span class="facility-hours">
+                                <i class="fas fa-clock"></i>
+                                ${facility.operatingHours?.monday || "9:00 AM - 6:00 PM"}
+                            </span>
+                            <div class="facility-actions">
+                                <button class="action-btn" onclick="event.stopPropagation(); openDirections('${facility._id}')">
+                                    <i class="fas fa-directions"></i>
+                                </button>
+                                <button class="action-btn" onclick="event.stopPropagation(); callFacility('${facility.contact?.phone}')">
+                                    <i class="fas fa-phone"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      // Filter by material
+      function filterByMaterial(material) {
+        // Update active chip
+        document
+          .querySelectorAll(".chip")
+          .forEach((c) => c.classList.remove("active"));
+        event.target.classList.add("active");
+
+        if (material === "all") {
+          renderFacilities(allFacilities);
+        } else {
+          const filtered = allFacilities.filter(
+            (f) =>
+              f.acceptedMaterials && f.acceptedMaterials.includes(material),
+          );
+          renderFacilities(filtered);
+        }
+      }
+
+      // Search facilities
+      function searchFacilities() {
+        const query = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+
+        if (!query) {
+          renderFacilities(allFacilities);
+          return;
+        }
+
+        const filtered = allFacilities.filter(
+          (f) =>
+            f.name.toLowerCase().includes(query) ||
+            (f.address?.city && f.address.city.toLowerCase().includes(query)) ||
+            (f.address?.area && f.address.area.toLowerCase().includes(query)),
+        );
+        renderFacilities(filtered);
+      }
+
+      // Check if facility is open
+      function checkIfOpen(hours) {
+        if (!hours) return true;
+
+        const now = new Date();
+        const day = now
+          .toLocaleDateString("en-US", { weekday: "long" })
+          .toLowerCase();
+        const dayHours = hours[day];
+
+        if (!dayHours || dayHours === "Closed") return false;
+
+        // Simple check - you could make this more sophisticated
+        const hour = now.getHours();
+        return hour >= 9 && hour < 18;
+      }
+
+      // Open facility detail
+      async function openFacilityDetail(facilityId) {
+        currentFacility = allFacilities.find((f) => f._id === facilityId);
+
+        if (!currentFacility) {
+          // Fetch from API if not in list
+          try {
+            const response = await fetch(
+              `${API_BASE}/facilities/${facilityId}`,
+            );
+            const data = await response.json();
+            if (data.success) {
+              currentFacility = data.facility;
+            }
+          } catch (error) {
+            showToast("Error loading facility details", "error");
+            return;
+          }
+        }
+
+        // Populate modal
+        document.getElementById("modalFacilityName").textContent =
+          currentFacility.name;
+        document.getElementById("modalFacilityAddress").textContent =
+          `${currentFacility.address?.area || ""}, ${currentFacility.address?.city || ""}`;
+        document.getElementById("modalHours").textContent =
+          currentFacility.operatingHours?.monday || "9:00 AM - 6:00 PM";
+        document.getElementById("modalPhone").textContent =
+          currentFacility.contact?.phone || "Not available";
+        document.getElementById("modalDistance").textContent =
+          currentFacility.distance
+            ? `${currentFacility.distance.toFixed(1)} km away`
+            : "Distance unknown";
+
+        // Materials
+        const materialsHtml = (currentFacility.acceptedMaterials || [])
+          .map((m) => `<span class="material-tag ${m}">${m}</span>`)
+          .join("");
+        document.getElementById("modalMaterials").innerHTML =
+          materialsHtml || "Not specified";
+
+        // Reviews
+        const reviews = currentFacility.reviews || [];
+        if (reviews.length > 0) {
+          document.getElementById("modalReviews").innerHTML = reviews
+            .slice(0, 3)
+            .map(
+              (r) => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <span class="review-author">${r.user?.firstName || "Anonymous"}</span>
+                            <span class="review-date">${formatDate(r.createdAt)}</span>
+                        </div>
+                        <div class="facility-rating" style="margin-bottom: 8px;">
+                            <span class="stars">${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</span>
+                        </div>
+                        ${r.comment ? `<p class="review-text">${r.comment}</p>` : ""}
+                    </div>
+                `,
+            )
+            .join("");
+        } else {
+          document.getElementById("modalReviews").innerHTML =
+            '<p style="color: rgba(255,255,255,0.5);">No reviews yet. Be the first!</p>';
+        }
+
+        // Reset rating input
+        selectedRating = 0;
+        document
+          .querySelectorAll("#ratingInput i")
+          .forEach((star) => star.classList.remove("active"));
+        document.getElementById("reviewText").value = "";
+
+        // Show modal
+        document.getElementById("facilityModal").classList.add("active");
+      }
+
+      function closeFacilityModal() {
+        document.getElementById("facilityModal").classList.remove("active");
+        currentFacility = null;
+      }
+
+      // Setup rating input
+      function setupRatingInput() {
+        document.querySelectorAll("#ratingInput i").forEach((star) => {
+          star.addEventListener("click", function () {
+            selectedRating = parseInt(this.dataset.rating);
+            document.querySelectorAll("#ratingInput i").forEach((s, i) => {
+              s.classList.toggle("active", i < selectedRating);
+            });
+          });
+
+          star.addEventListener("mouseover", function () {
+            const hoverRating = parseInt(this.dataset.rating);
+            document.querySelectorAll("#ratingInput i").forEach((s, i) => {
+              s.classList.toggle("active", i < hoverRating);
+            });
+          });
+
+          star.addEventListener("mouseout", function () {
+            document.querySelectorAll("#ratingInput i").forEach((s, i) => {
+              s.classList.toggle("active", i < selectedRating);
+            });
+          });
+        });
+      }
+
+      // Submit review
+      async function submitReview() {
+        if (!token) {
+          showToast("Please login to leave a review", "error");
+          return;
+        }
+
+        if (!selectedRating) {
+          showToast("Please select a rating", "error");
+          return;
+        }
+
+        if (!currentFacility) return;
+
+        try {
+          const response = await fetch(
+            `${API_BASE}/facilities/${currentFacility._id}/review`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                rating: selectedRating,
+                comment: document.getElementById("reviewText").value,
+              }),
+            },
+          );
+
+          const data = await response.json();
+
+          if (data.success) {
+            showToast("Review submitted!", "success");
+            closeFacilityModal();
+            loadFacilities();
+          } else {
+            showToast(data.message || "Failed to submit review", "error");
+          }
+        } catch (error) {
+          showToast("Network error", "error");
+        }
+      }
+
+      // Open directions
+      function openDirections(facilityId) {
+        const facility = facilityId
+          ? allFacilities.find((f) => f._id === facilityId)
+          : currentFacility;
+
+        if (facility && facility.location && facility.location.coordinates) {
+          const [lng, lat] = facility.location.coordinates;
+          window.open(
+            `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+            "_blank",
+          );
+        } else {
+          showToast("Location not available", "error");
+        }
+      }
+
+      // Call facility
+      function callFacility(phone) {
+        if (phone) {
+          window.location.href = `tel:${phone}`;
+        } else if (currentFacility?.contact?.phone) {
+          window.location.href = `tel:${currentFacility.contact.phone}`;
+        } else {
+          showToast("Phone number not available", "error");
+        }
+      }
+
+      function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString();
+      }
+
+      function showToast(message, type = "info") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast " + type;
+        toast.style.display = "block";
+        setTimeout(() => (toast.style.display = "none"), 3000);
+      }
+
+      // Close modal on outside click
+      document
+        .getElementById("facilityModal")
+        .addEventListener("click", (e) => {
+          if (e.target.id === "facilityModal") {
+            closeFacilityModal();
+          }
+        });
+    </script>
+  </body>
+</html>

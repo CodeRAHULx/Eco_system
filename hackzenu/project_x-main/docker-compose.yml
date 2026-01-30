@@ -1,0 +1,229 @@
+version: '3.8'
+
+# ==============================================================================
+# SafeRoute AI - Docker Compose Configuration
+# ==============================================================================
+# 
+# Features:
+# - Complete microservices architecture
+# - Automatic container orchestration
+# - Data persistence with volumes
+# - Network isolation
+# - Environment-based configuration
+# 
+# Usage:
+#   docker-compose up -d          # Start all services
+#   docker-compose logs -f        # View logs
+#   docker-compose down           # Stop all services
+#
+
+services:
+  # ===========================================================================
+  # MongoDB Database
+  # ===========================================================================
+  
+  mongo:
+    image: mongo:6-alpine
+    container_name: saferoute-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: saferoute
+    volumes:
+      - mongo_data:/data/db
+      - mongo_config:/data/configdb
+    networks:
+      - saferoute-network
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================================================
+  # Redis Cache
+  # ===========================================================================
+  
+  redis:
+    image: redis:7-alpine
+    container_name: saferoute-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis123}
+    volumes:
+      - redis_data:/data
+    networks:
+      - saferoute-network
+    restart: unless-stopped
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===========================================================================
+  # Backend API Server
+  # ===========================================================================
+  
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: saferoute-backend
+    ports:
+      - "5000:5000"
+    environment:
+      # Server
+      PORT: 5000
+      NODE_ENV: ${NODE_ENV:-development}
+      
+      # Database
+      MONGODB_URI: mongodb://root:password123@mongo:27017/saferoute
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis123}
+      
+      # JWT
+      JWT_SECRET: ${JWT_SECRET:-your-super-secret-key-change-in-production}
+      JWT_EXPIRY: 7d
+      
+      # CORS
+      FRONTEND_URL: http://localhost:3000
+      
+      # AI Service
+      AI_SERVICE_URL: http://ai_service:8000
+      
+      # Groq API
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      
+      # Logging
+      LOG_LEVEL: info
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - saferoute-network
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # ===========================================================================
+  # AI Service (Python FastAPI)
+  # ===========================================================================
+  
+  ai_service:
+    build:
+      context: ./ai_service
+      dockerfile: Dockerfile
+    container_name: saferoute-ai
+    ports:
+      - "8000:8000"
+    environment:
+      # Server
+      HOST: 0.0.0.0
+      PORT: 8000
+      ENV: ${ENV:-development}
+      
+      # Groq API
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: mixtral-8x7b-32768
+      
+      # Database
+      MONGODB_URI: mongodb://root:password123@mongo:27017/saferoute
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis123}
+      
+      # Logging
+      LOG_LEVEL: info
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - saferoute-network
+    restart: unless-stopped
+    volumes:
+      - ./ai_service:/app
+    command: python -m uvicorn ai_service:app --host 0.0.0.0 --port 8000 --reload
+
+  # ===========================================================================
+  # Frontend (React)
+  # ===========================================================================
+  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: saferoute-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      # API Configuration
+      REACT_APP_API_URL: http://localhost:5000
+      REACT_APP_AI_URL: http://localhost:8000
+      REACT_APP_SOCKET_URL: http://localhost:5000
+      
+      # Build
+      NODE_ENV: ${NODE_ENV:-development}
+      
+      # Features
+      REACT_APP_ENABLE_NOTIFICATIONS: "true"
+      REACT_APP_ENABLE_LOCATION_TRACKING: "true"
+    networks:
+      - saferoute-network
+    restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm start
+
+  # ===========================================================================
+  # Nginx Reverse Proxy (Optional)
+  # ===========================================================================
+  
+  nginx:
+    image: nginx:alpine
+    container_name: saferoute-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+      - ai_service
+    networks:
+      - saferoute-network
+    restart: unless-stopped
+    profiles: ["production"]
+
+# ==============================================================================
+# NETWORKS
+# ==============================================================================
+
+networks:
+  saferoute-network:
+    driver: bridge
+
+# ==============================================================================
+# VOLUMES (Data Persistence)
+# ==============================================================================
+
+volumes:
+  mongo_data:
+    driver: local
+  mongo_config:
+    driver: local
+  redis_data:
+    driver: local

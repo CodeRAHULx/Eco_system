@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order - EcoSustain</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 i { color: #4ade80; }
+
+        .map-container {
+            height: 300px;
+            background: rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .container {
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        .order-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: #4ade80;
+            font-size: 1.1rem;
+        }
+
+        .order-status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .order-status.pending { background: rgba(251,191,36,0.2); color: #fbbf24; }
+        .order-status.confirmed { background: rgba(34,211,238,0.2); color: #22d3ee; }
+        .order-status.assigned { background: rgba(59,130,246,0.2); color: #3b82f6; }
+        .order-status.in_transit { background: rgba(168,85,247,0.2); color: #a855f7; }
+        .order-status.arrived { background: rgba(74,222,128,0.2); color: #4ade80; }
+        .order-status.completed { background: rgba(74,222,128,0.3); color: #4ade80; }
+        .order-status.cancelled { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+        .status-timeline {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 15px;
+            padding: 12px 0;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 35px;
+            bottom: -12px;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .timeline-item.completed::before {
+            background: #4ade80;
+        }
+
+        .timeline-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: rgba(255,255,255,0.4);
+            flex-shrink: 0;
+        }
+
+        .timeline-item.completed .timeline-dot {
+            background: rgba(74,222,128,0.2);
+            color: #4ade80;
+        }
+
+        .timeline-item.active .timeline-dot {
+            background: #4ade80;
+            color: #000;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(74,222,128,0); }
+        }
+
+        .timeline-content h4 {
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .timeline-content p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .worker-card {
+            background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(34,211,238,0.1));
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(74,222,128,0.3);
+        }
+
+        .worker-card h3 {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 15px;
+        }
+
+        .worker-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .worker-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ade80, #22d3ee);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .worker-details {
+            flex: 1;
+        }
+
+        .worker-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .worker-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+        }
+
+        .worker-vehicle {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 5px;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .contact-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .contact-btn.call {
+            background: linear-gradient(90deg, #4ade80, #22d3ee);
+            color: #000;
+        }
+
+        .contact-btn.message {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .order-details {
+            margin-top: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .eta-banner {
+            background: linear-gradient(90deg, rgba(74,222,128,0.2), rgba(34,211,238,0.2));
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .eta-banner .eta-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .eta-banner .eta-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4ade80;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #4ade80;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .cancel-btn {
+            width: 100%;
+            padding: 15px;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #ef4444;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(239,68,68,0.2);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <button class="back-btn" onclick="history.back()">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1><i class="fas fa-truck"></i> Track Order</h1>
+    </header>
+
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
+
+    <div class="container" id="content">
+        <div class="loading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const API_BASE = '/api';
+        const token = localStorage.getItem('token');
+        let order = null;
+        let map = null;
+        let workerMarker = null;
+        let customerMarker = null;
+        let locationInterval = null;
+
+        // Get order ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+            if (!orderId) {
+                showError('No order specified');
+                return;
+            }
+            initMap();
+            loadOrder();
+        });
+
+        function initMap() {
+            map = L.map('map').setView([28.6139, 77.209], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+        }
+
+        async function loadOrder() {
+            try {
+                const res = await fetch(`${API_BASE}/orders/${orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    showError(data.message || 'Order not found');
+                    return;
+                }
+
+                order = data.order;
+                renderOrder();
+                updateMap();
+
+                // Start live tracking if order is in transit
+                if (['assigned', 'in_transit', 'arrived'].includes(order.status)) {
+                    startLiveTracking();
+                }
+            } catch (error) {
+                console.error('Error loading order:', error);
+                showError('Failed to load order');
+            }
+        }
+
+        function renderOrder() {
+            const container = document.getElementById('content');
+            
+            const statusSteps = [
+                { key: 'pending', icon: 'fa-clock', label: 'Order Placed', desc: 'Waiting for confirmation' },
+                { key: 'confirmed', icon: 'fa-check', label: 'Confirmed', desc: 'Order confirmed' },
+                { key: 'assigned', icon: 'fa-user', label: 'Collector Assigned', desc: 'On the way to pickup' },
+                { key: 'in_transit', icon: 'fa-truck', label: 'In Transit', desc: 'Collector on the way' },
+                { key: 'arrived', icon: 'fa-map-marker-alt', label: 'Arrived', desc: 'Collector has arrived' },
+                { key: 'completed', icon: 'fa-check-circle', label: 'Completed', desc: 'Pickup completed' }
+            ];
+
+            const currentIndex = statusSteps.findIndex(s => s.key === order.status);
+
+            container.innerHTML = `
+                <div class="order-card">
+                    <div class="order-header">
+                        <span class="order-id">${order.orderId || '#' + order._id.slice(-6)}</span>
+                        <span class="order-status ${order.status}">${formatStatus(order.status)}</span>
+                    </div>
+
+                    ${['assigned', 'in_transit'].includes(order.status) ? `
+                        <div class="eta-banner">
+                            <div class="eta-label">Estimated Arrival</div>
+                            <div class="eta-time" id="etaTime">Calculating...</div>
+                        </div>
+                    ` : ''}
+
+                    <div class="status-timeline">
+                        ${statusSteps.map((step, index) => {
+                            let stateClass = '';
+                            if (index < currentIndex) stateClass = 'completed';
+                            else if (index === currentIndex) stateClass = 'active';
+                            
+                            return `
+                                <div class="timeline-item ${stateClass}">
+                                    <div class="timeline-dot">
+                                        <i class="fas ${step.icon}"></i>
+                                    </div>
+                                    <div class="timeline-content">
+                                        <h4>${step.label}</h4>
+                                        <p>${step.desc}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                ${order.assignedWorker ? `
+                    <div class="worker-card">
+                        <h3>Your Collector</h3>
+                        <div class="worker-info">
+                            <div class="worker-avatar">${(order.assignedWorker.profile?.name || 'W').charAt(0)}</div>
+                            <div class="worker-details">
+                                <div class="worker-name">${order.assignedWorker.profile?.name || 'Collector'}</div>
+                                <div class="worker-rating">
+                                    <i class="fas fa-star"></i>
+                                    <span>${order.assignedWorker.workerInfo?.rating?.toFixed(1) || '4.5'}</span>
+                                </div>
+                                <div class="worker-vehicle">
+                                    <i class="fas fa-id-card"></i> ${order.assignedWorker.workerInfo?.employeeId || 'N/A'}
+                                    ${order.assignedWorker.workerInfo?.vehicleNumber ? ` • 🚛 ${order.assignedWorker.workerInfo.vehicleNumber}` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="contact-buttons">
+                            <a href="tel:${order.assignedWorker.phone}" class="contact-btn call">
+                                <i class="fas fa-phone"></i> Call
+                            </a>
+                            <a href="sms:${order.assignedWorker.phone}" class="contact-btn message">
+                                <i class="fas fa-comment"></i> Message
+                            </a>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="order-card">
+                    <h3 style="margin-bottom: 15px; font-size: 1rem;">Order Details</h3>
+                    <div class="order-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Scheduled Date</span>
+                            <span class="detail-value">${new Date(order.scheduledDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Time Slot</span>
+                            <span class="detail-value">${order.scheduledTime || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Waste Types</span>
+                            <span class="detail-value">${(order.wasteTypes || []).join(', ')}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Quantity</span>
+                            <span class="detail-value">${order.estimatedQuantity} kg</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Estimated Value</span>
+                            <span class="detail-value">₹${order.estimatedValue || 0}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Pickup Location</span>
+                            <span class="detail-value">${order.location?.area || order.location?.city || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                ${['pending', 'confirmed'].includes(order.status) ? `
+                    <button class="cancel-btn" onclick="cancelOrder()">
+                        <i class="fas fa-times"></i> Cancel Order
+                    </button>
+                ` : ''}
+            `;
+        }
+
+        function updateMap() {
+            if (!order) return;
+
+            // Add customer location marker
+            if (order.location?.coordinates?.lat) {
+                const customerIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background: #4ade80; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);"></div>',
+                    iconSize: [20, 20]
+                });
+                
+                customerMarker = L.marker([order.location.coordinates.lat, order.location.coordinates.lng], { icon: customerIcon })
+                    .addTo(map)
+                    .bindPopup('Pickup Location');
+                
+                map.setView([order.location.coordinates.lat, order.location.coordinates.lng], 15);
+            }
+        }
+
+        function startLiveTracking() {
+            // Poll for worker location every 10 seconds
+            updateWorkerLocation();
+            locationInterval = setInterval(updateWorkerLocation, 10000);
+        }
+
+        async function updateWorkerLocation() {
+            if (!order?.assignedWorker?._id) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/location/worker/${order.assignedWorker._id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.success && data.location?.coordinates) {
+                    const { lat, lng } = data.location.coordinates;
+                    
+                    const workerIcon = L.divIcon({
+                        className: 'worker-marker',
+                        html: '<div style="background: #3b82f6; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;"><i class="fas fa-truck" style="color: white; font-size: 10px;"></i></div>',
+                        iconSize: [24, 24]
+                    });
+
+                    if (workerMarker) {
+                        workerMarker.setLatLng([lat, lng]);
+                    } else {
+                        workerMarker = L.marker([lat, lng], { icon: workerIcon })
+                            .addTo(map)
+                            .bindPopup('Collector Location');
+                    }
+
+                    // Calculate ETA (simple distance-based estimate)
+                    if (order.location?.coordinates?.lat && document.getElementById('etaTime')) {
+                        const distance = calculateDistance(
+                            lat, lng,
+                            order.location.coordinates.lat,
+                            order.location.coordinates.lng
+                        );
+                        const etaMinutes = Math.round(distance / 0.5); // Assume 30 km/h avg speed
+                        document.getElementById('etaTime').textContent = 
+                            etaMinutes < 5 ? 'Arriving soon!' : `~${etaMinutes} mins`;
+                    }
+
+                    // Fit map to show both markers
+                    if (customerMarker) {
+                        const group = new L.featureGroup([workerMarker, customerMarker]);
+                        map.fitBounds(group.getBounds().pad(0.2));
+                    }
+                }
+            } catch (error) {
+                console.log('Could not get worker location');
+            }
+        }
+
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        async function cancelOrder() {
+            if (!confirm('Are you sure you want to cancel this order?')) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/orders/${orderId}/cancel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ reason: 'Cancelled by user' })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    alert('Order cancelled successfully');
+                    window.location.href = '/dashboard.html';
+                } else {
+                    alert(data.message || 'Failed to cancel order');
+                }
+            } catch (error) {
+                alert('Failed to cancel order');
+            }
+        }
+
+        function formatStatus(status) {
+            const statusMap = {
+                'pending': 'Pending',
+                'confirmed': 'Confirmed',
+                'assigned': 'Assigned',
+                'in_transit': 'On the way',
+                'arrived': 'Arrived',
+                'completed': 'Completed',
+                'cancelled': 'Cancelled'
+            };
+            return statusMap[status] || status;
+        }
+
+        function showError(message) {
+            document.getElementById('content').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Error</h3>
+                    <p>${message}</p>
+                    <a href="/dashboard.html" style="color: #4ade80;">← Back to Dashboard</a>
+                </div>
+            `;
+        }
+
+        // Cleanup on page leave
+        window.addEventListener('beforeunload', () => {
+            if (locationInterval) clearInterval(locationInterval);
+        });
+    </script>
+</body>
+</html>

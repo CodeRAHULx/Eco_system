@@ -1,0 +1,1052 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoSustain - Recycling Tracker</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        color: #fff;
+        padding-bottom: 80px;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .header h1 {
+        flex: 1;
+        font-size: 1.3rem;
+      }
+
+      /* Container */
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      /* Tab Navigation */
+      .tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+      }
+
+      .tab {
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 25px;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.3s;
+      }
+
+      .tab.active {
+        background: linear-gradient(135deg, #4ade80, #22d3ee);
+        color: #000;
+        border-color: transparent;
+      }
+
+      /* Stats Cards */
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 25px;
+      }
+
+      .stat-mini {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .stat-mini i {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+
+      .stat-mini.green i {
+        color: #4ade80;
+      }
+      .stat-mini.yellow i {
+        color: #fbbf24;
+      }
+      .stat-mini.blue i {
+        color: #22d3ee;
+      }
+
+      .stat-mini .value {
+        font-size: 1.3rem;
+        font-weight: bold;
+      }
+
+      .stat-mini .label {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 3px;
+      }
+
+      /* Log Form */
+      .log-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .section-title i {
+        color: #4ade80;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .form-group select,
+      .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+      }
+
+      .form-group select option {
+        background: #1a1a2e;
+      }
+
+      /* Category Grid */
+      .category-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .category-btn {
+        padding: 15px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .category-btn i {
+        font-size: 24px;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .category-btn span {
+        font-size: 0.75rem;
+      }
+
+      .category-btn.selected {
+        background: rgba(74, 222, 128, 0.2);
+        border-color: #4ade80;
+      }
+
+      .category-btn.plastic i {
+        color: #60a5fa;
+      }
+      .category-btn.paper i {
+        color: #fbbf24;
+      }
+      .category-btn.metal i {
+        color: #a1a1aa;
+      }
+      .category-btn.glass i {
+        color: #22d3ee;
+      }
+      .category-btn.electronics i {
+        color: #a855f7;
+      }
+      .category-btn.organic i {
+        color: #4ade80;
+      }
+
+      /* Weight Input */
+      .weight-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .weight-input input {
+        flex: 1;
+      }
+
+      .weight-input span {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Submit Button */
+      .submit-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #4ade80, #22d3ee);
+        border: none;
+        border-radius: 12px;
+        color: #000;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(74, 222, 128, 0.4);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* History List */
+      .history-section {
+        margin-top: 25px;
+      }
+
+      .history-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .history-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+
+      .history-icon.plastic {
+        background: rgba(96, 165, 250, 0.2);
+        color: #60a5fa;
+      }
+      .history-icon.paper {
+        background: rgba(251, 191, 36, 0.2);
+        color: #fbbf24;
+      }
+      .history-icon.metal {
+        background: rgba(161, 161, 170, 0.2);
+        color: #a1a1aa;
+      }
+      .history-icon.glass {
+        background: rgba(34, 211, 238, 0.2);
+        color: #22d3ee;
+      }
+      .history-icon.electronics {
+        background: rgba(168, 85, 247, 0.2);
+        color: #a855f7;
+      }
+      .history-icon.organic {
+        background: rgba(74, 222, 128, 0.2);
+        color: #4ade80;
+      }
+
+      .history-details {
+        flex: 1;
+      }
+
+      .history-details h4 {
+        font-size: 0.95rem;
+        margin-bottom: 3px;
+        text-transform: capitalize;
+      }
+
+      .history-details p {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .history-points {
+        text-align: right;
+      }
+
+      .history-points .points {
+        font-weight: bold;
+        color: #4ade80;
+        font-size: 1rem;
+      }
+
+      .history-points .weight {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* Leaderboard */
+      .leaderboard-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        margin-bottom: 10px;
+      }
+
+      .rank {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 15px;
+      }
+
+      .rank.gold {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #000;
+      }
+      .rank.silver {
+        background: linear-gradient(135deg, #94a3b8, #64748b);
+        color: #000;
+      }
+      .rank.bronze {
+        background: linear-gradient(135deg, #fb923c, #ea580c);
+        color: #000;
+      }
+      .rank.other {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .leaderboard-info {
+        flex: 1;
+      }
+
+      .leaderboard-info h4 {
+        font-size: 0.95rem;
+      }
+
+      .leaderboard-info p {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .leaderboard-points {
+        font-weight: bold;
+        color: #4ade80;
+      }
+
+      /* Impact Card */
+      .impact-card {
+        background: linear-gradient(
+          135deg,
+          rgba(74, 222, 128, 0.2),
+          rgba(34, 211, 238, 0.1)
+        );
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 25px;
+      }
+
+      .impact-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-top: 15px;
+      }
+
+      .impact-item {
+        text-align: center;
+      }
+
+      .impact-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #4ade80;
+      }
+
+      .impact-label {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      /* Empty State */
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      .empty-state i {
+        font-size: 50px;
+        margin-bottom: 15px;
+        opacity: 0.5;
+      }
+
+      /* Loading */
+      .loading {
+        display: flex;
+        justify-content: center;
+        padding: 40px;
+      }
+
+      .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top-color: #4ade80;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Bottom Navigation */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        font-size: 0.75rem;
+      }
+
+      .nav-item i {
+        font-size: 20px;
+      }
+
+      .nav-item.active {
+        color: #4ade80;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 10px;
+        z-index: 2000;
+        display: none;
+      }
+
+      .toast.success {
+        background: rgba(74, 222, 128, 0.9);
+        color: #000;
+      }
+      .toast.error {
+        background: rgba(239, 68, 68, 0.9);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <button class="back-btn" onclick="history.back()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h1>
+        <i class="fas fa-recycle" style="color: #4ade80"></i> Recycling Tracker
+      </h1>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+      <!-- Tabs -->
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('log')">Log Item</div>
+        <div class="tab" onclick="showTab('history')">History</div>
+        <div class="tab" onclick="showTab('leaderboard')">Leaderboard</div>
+        <div class="tab" onclick="showTab('impact')">Impact</div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-mini green">
+          <i class="fas fa-recycle"></i>
+          <div class="value" id="totalItems">0</div>
+          <div class="label">Items</div>
+        </div>
+        <div class="stat-mini yellow">
+          <i class="fas fa-coins"></i>
+          <div class="value" id="totalPoints">0</div>
+          <div class="label">Points</div>
+        </div>
+        <div class="stat-mini blue">
+          <i class="fas fa-weight-hanging"></i>
+          <div class="value" id="totalWeight">0</div>
+          <div class="label">kg Recycled</div>
+        </div>
+      </div>
+
+      <!-- Log Tab -->
+      <div id="logTab" class="tab-content">
+        <div class="log-section">
+          <h3 class="section-title">
+            <i class="fas fa-plus-circle"></i> Log Recycled Item
+          </h3>
+
+          <div class="form-group">
+            <label>What did you recycle?</label>
+            <div class="category-grid">
+              <div
+                class="category-btn plastic"
+                onclick="selectCategory('plastic')"
+              >
+                <i class="fas fa-wine-bottle"></i>
+                <span>Plastic</span>
+              </div>
+              <div class="category-btn paper" onclick="selectCategory('paper')">
+                <i class="fas fa-newspaper"></i>
+                <span>Paper</span>
+              </div>
+              <div class="category-btn metal" onclick="selectCategory('metal')">
+                <i class="fas fa-recycle"></i>
+                <span>Metal</span>
+              </div>
+              <div class="category-btn glass" onclick="selectCategory('glass')">
+                <i class="fas fa-glass-whiskey"></i>
+                <span>Glass</span>
+              </div>
+              <div
+                class="category-btn electronics"
+                onclick="selectCategory('electronics')"
+              >
+                <i class="fas fa-laptop"></i>
+                <span>E-Waste</span>
+              </div>
+              <div
+                class="category-btn organic"
+                onclick="selectCategory('organic')"
+              >
+                <i class="fas fa-leaf"></i>
+                <span>Organic</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Weight (kg)</label>
+            <div class="weight-input">
+              <input
+                type="number"
+                id="weightInput"
+                step="0.1"
+                min="0.1"
+                placeholder="Enter weight"
+                value="1"
+              />
+              <span>kg</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description (optional)</label>
+            <input
+              type="text"
+              id="descriptionInput"
+              placeholder="e.g., 5 plastic bottles"
+            />
+          </div>
+
+          <button class="submit-btn" onclick="logRecycling()" id="logBtn">
+            <i class="fas fa-check"></i>
+            Log Recycling
+          </button>
+        </div>
+      </div>
+
+      <!-- History Tab -->
+      <div id="historyTab" class="tab-content" style="display: none">
+        <div class="history-section">
+          <h3 class="section-title">
+            <i class="fas fa-history"></i> Your Recycling History
+          </h3>
+          <div id="historyList">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard Tab -->
+      <div id="leaderboardTab" class="tab-content" style="display: none">
+        <div class="history-section">
+          <h3 class="section-title">
+            <i class="fas fa-trophy"></i> Top Recyclers
+          </h3>
+          <div id="leaderboardList">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Impact Tab -->
+      <div id="impactTab" class="tab-content" style="display: none">
+        <div class="impact-card">
+          <h3 class="section-title">
+            <i class="fas fa-globe-americas"></i> Your Environmental Impact
+          </h3>
+          <div class="impact-grid">
+            <div class="impact-item">
+              <div class="impact-value" id="co2Saved">0</div>
+              <div class="impact-label">kg CO₂ Saved</div>
+            </div>
+            <div class="impact-item">
+              <div class="impact-value" id="waterSaved">0</div>
+              <div class="impact-label">L Water Saved</div>
+            </div>
+            <div class="impact-item">
+              <div class="impact-value" id="treesSaved">0</div>
+              <div class="impact-label">Trees Saved</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="log-section">
+          <h3 class="section-title">
+            <i class="fas fa-chart-bar"></i> By Category
+          </h3>
+          <div id="categoryBreakdown">
+            <div class="loading"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a class="nav-item" href="dashboard.html">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a class="nav-item" href="scan.html">
+        <i class="fas fa-camera"></i>
+        <span>Scan</span>
+      </a>
+      <a class="nav-item active" href="recycling.html">
+        <i class="fas fa-recycle"></i>
+        <span>Recycle</span>
+      </a>
+      <a class="nav-item" href="incidents.html">
+        <i class="fas fa-shield-alt"></i>
+        <span>Safety</span>
+      </a>
+      <a class="nav-item" href="order.html">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Orders</span>
+      </a>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const API_BASE = "/api";
+      let token = localStorage.getItem("token");
+      let selectedCategory = null;
+
+      // Check auth
+      document.addEventListener("DOMContentLoaded", () => {
+        if (!token) {
+          window.location.href = "/";
+          return;
+        }
+        loadStats();
+      });
+
+      // Tab switching
+      function showTab(tabName) {
+        // Update tab buttons
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        event.target.classList.add("active");
+
+        // Hide all tabs
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => (c.style.display = "none"));
+
+        // Show selected tab
+        document.getElementById(`${tabName}Tab`).style.display = "block";
+
+        // Load data for tab
+        if (tabName === "history") loadHistory();
+        if (tabName === "leaderboard") loadLeaderboard();
+        if (tabName === "impact") loadImpact();
+      }
+
+      // Select category
+      function selectCategory(category) {
+        document
+          .querySelectorAll(".category-btn")
+          .forEach((btn) => btn.classList.remove("selected"));
+        document
+          .querySelector(`.category-btn.${category}`)
+          .classList.add("selected");
+        selectedCategory = category;
+      }
+
+      // Load stats
+      async function loadStats() {
+        try {
+          const response = await fetch(`${API_BASE}/recycling/stats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await response.json();
+
+          if (data.success && data.stats) {
+            document.getElementById("totalItems").textContent =
+              data.stats.totalItems || 0;
+            document.getElementById("totalPoints").textContent =
+              data.stats.totalPoints || 0;
+            document.getElementById("totalWeight").textContent = (
+              data.stats.totalWeight || 0
+            ).toFixed(1);
+          }
+        } catch (error) {
+          console.error("Error loading stats:", error);
+        }
+      }
+
+      // Log recycling
+      async function logRecycling() {
+        if (!selectedCategory) {
+          showToast("Please select a category", "error");
+          return;
+        }
+
+        const weight = parseFloat(document.getElementById("weightInput").value);
+        if (!weight || weight <= 0) {
+          showToast("Please enter a valid weight", "error");
+          return;
+        }
+
+        const btn = document.getElementById("logBtn");
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging...';
+
+        try {
+          const response = await fetch(`${API_BASE}/recycling/log`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              category: selectedCategory,
+              weight: weight,
+              description: document.getElementById("descriptionInput").value,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showToast(
+              `+${data.record.pointsEarned} points! Great job recycling!`,
+              "success",
+            );
+
+            // Reset form
+            selectedCategory = null;
+            document
+              .querySelectorAll(".category-btn")
+              .forEach((btn) => btn.classList.remove("selected"));
+            document.getElementById("weightInput").value = "1";
+            document.getElementById("descriptionInput").value = "";
+
+            // Reload stats
+            loadStats();
+          } else {
+            showToast(data.message || "Failed to log recycling", "error");
+          }
+        } catch (error) {
+          console.error("Error logging:", error);
+          showToast("Network error", "error");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-check"></i> Log Recycling';
+        }
+      }
+
+      // Load history
+      async function loadHistory() {
+        const container = document.getElementById("historyList");
+        container.innerHTML =
+          '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+          const response = await fetch(`${API_BASE}/recycling/history`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await response.json();
+
+          if (data.success && data.records && data.records.length > 0) {
+            container.innerHTML = data.records
+              .map(
+                (record) => `
+                        <div class="history-item">
+                            <div class="history-icon ${record.category}">
+                                <i class="fas fa-${getCategoryIcon(record.category)}"></i>
+                            </div>
+                            <div class="history-details">
+                                <h4>${record.category}</h4>
+                                <p>${record.description || "No description"} • ${formatDate(record.createdAt)}</p>
+                            </div>
+                            <div class="history-points">
+                                <div class="points">+${record.pointsEarned}</div>
+                                <div class="weight">${record.weight} kg</div>
+                            </div>
+                        </div>
+                    `,
+              )
+              .join("");
+          } else {
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-recycle"></i>
+                            <p>No recycling history yet.<br>Start logging to track your impact!</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          container.innerHTML =
+            '<div class="empty-state"><p>Error loading history</p></div>';
+        }
+      }
+
+      // Load leaderboard
+      async function loadLeaderboard() {
+        const container = document.getElementById("leaderboardList");
+        container.innerHTML =
+          '<div class="loading"><div class="spinner"></div></div>';
+
+        try {
+          const response = await fetch(`${API_BASE}/recycling/leaderboard`);
+          const data = await response.json();
+
+          if (data.success && data.leaderboard && data.leaderboard.length > 0) {
+            container.innerHTML = data.leaderboard
+              .map((item, index) => {
+                const rankClass =
+                  index === 0
+                    ? "gold"
+                    : index === 1
+                      ? "silver"
+                      : index === 2
+                        ? "bronze"
+                        : "other";
+                return `
+                            <div class="leaderboard-item">
+                                <div class="rank ${rankClass}">${index + 1}</div>
+                                <div class="leaderboard-info">
+                                    <h4>${item.user?.firstName || "Anonymous"} ${item.user?.lastName?.charAt(0) || ""}</h4>
+                                    <p>${item.totalItems} items • ${item.totalWeight?.toFixed(1)} kg</p>
+                                </div>
+                                <div class="leaderboard-points">${item.totalPoints} pts</div>
+                            </div>
+                        `;
+              })
+              .join("");
+
+            if (data.userRank) {
+              container.innerHTML += `
+                            <div style="margin-top: 20px; padding: 15px; background: rgba(74, 222, 128, 0.1); border-radius: 12px; text-align: center;">
+                                <p style="color: rgba(255,255,255,0.7);">Your Rank</p>
+                                <p style="font-size: 1.5rem; font-weight: bold; color: #4ade80;">#${data.userRank}</p>
+                            </div>
+                        `;
+            }
+          } else {
+            container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-trophy"></i>
+                            <p>No leaderboard data yet.<br>Be the first to recycle!</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          container.innerHTML =
+            '<div class="empty-state"><p>Error loading leaderboard</p></div>';
+        }
+      }
+
+      // Load impact
+      async function loadImpact() {
+        try {
+          const response = await fetch(`${API_BASE}/recycling/stats`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await response.json();
+
+          if (data.success && data.stats) {
+            const impact = data.stats.environmentalImpact || {};
+            document.getElementById("co2Saved").textContent = (
+              impact.co2Saved || 0
+            ).toFixed(1);
+            document.getElementById("waterSaved").textContent = Math.round(
+              impact.waterSaved || 0,
+            );
+            document.getElementById("treesSaved").textContent = (
+              impact.treesSaved || 0
+            ).toFixed(2);
+
+            // Category breakdown
+            const breakdown = data.stats.byCategory || {};
+            const container = document.getElementById("categoryBreakdown");
+
+            if (Object.keys(breakdown).length > 0) {
+              container.innerHTML = Object.entries(breakdown)
+                .map(
+                  ([cat, info]) => `
+                            <div class="history-item">
+                                <div class="history-icon ${cat}">
+                                    <i class="fas fa-${getCategoryIcon(cat)}"></i>
+                                </div>
+                                <div class="history-details">
+                                    <h4 style="text-transform: capitalize;">${cat}</h4>
+                                    <p>${info.count} items</p>
+                                </div>
+                                <div class="history-points">
+                                    <div class="weight">${info.weight?.toFixed(1)} kg</div>
+                                </div>
+                            </div>
+                        `,
+                )
+                .join("");
+            } else {
+              container.innerHTML =
+                '<p style="text-align: center; color: rgba(255,255,255,0.5);">No data yet</p>';
+            }
+          }
+        } catch (error) {
+          console.error("Error loading impact:", error);
+        }
+      }
+
+      function getCategoryIcon(category) {
+        const icons = {
+          plastic: "wine-bottle",
+          paper: "newspaper",
+          metal: "recycle",
+          glass: "glass-whiskey",
+          electronics: "laptop",
+          organic: "leaf",
+        };
+        return icons[category] || "recycle";
+      }
+
+      function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        return date.toLocaleDateString();
+      }
+
+      function showToast(message, type = "info") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast " + type;
+        toast.style.display = "block";
+        setTimeout(() => (toast.style.display = "none"), 3000);
+      }
+    </script>
+  </body>
+</html>

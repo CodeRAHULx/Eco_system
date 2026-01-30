@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment files (NEVER commit these!)
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Firebase service account (sensitive!)
+firebase-service-account.json
+*-firebase-adminsdk-*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Build outputs
+dist/
+build/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Uploads (if local)
+uploads/
+
+# Keep these
+!.env.example
+!.gitkeep
